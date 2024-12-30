@@ -13,10 +13,8 @@ type paraFolder struct {
 	fileContent string
 }
 
-var baseDir string
-
 func main() {
-	// Allows the user to select a base directory to generate the structure
+	var baseDir string // Allows the user to select a base directory to generate the structure
 	flag.StringVar(&baseDir, "dir", ".", "Select a base directory for the structure to be generated")
 	flag.Parse() // Allows the flags to be accessed by the program
 
@@ -41,12 +39,12 @@ func main() {
 
 	fmt.Printf("Generating PARA structure in: %s \n", baseDir)
 
-	err := generateParaFolders(paraStructure)
+	err := generateParaFolders(paraStructure, baseDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = writeFileContent(paraStructure)
+	err = writeFileContent(paraStructure, baseDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,9 +53,9 @@ func main() {
 }
 
 // Writes content to the PARA Files
-func writeFileContent(paraStructure []paraFolder) error {
+func writeFileContent(paraStructure []paraFolder, baseDirectory string) error {
 	for _, folder := range paraStructure {
-		filePath := filepath.Join(baseDir, folder.folderName, "README.md")
+		filePath := filepath.Join(baseDirectory, folder.folderName, "README.md")
 
 		err := os.WriteFile(filePath, []byte(folder.fileContent), os.ModePerm)
 		if err != nil {
@@ -69,7 +67,7 @@ func writeFileContent(paraStructure []paraFolder) error {
 }
 
 // Generates the necessary Directories for the structure: PROJECTS, AREAS, RESOURCES and ARQUIVE
-func generateParaFolders(structure []paraFolder) error {
+func generateParaFolders(structure []paraFolder, baseDir string) error {
 	for _, folder := range structure {
 		// Creates the directories
 		err := os.MkdirAll(filepath.Join(baseDir, folder.folderName), os.ModePerm)
