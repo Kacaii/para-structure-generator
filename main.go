@@ -35,7 +35,7 @@ func main() {
 		},
 	}
 
-	fmt.Printf("Generating PARA structure in: %s\n", baseDir)
+	fmt.Printf("Generating PARA structure in: %s \n", baseDir)
 
 	err := generateParaFolders(paraStructure)
 	if err != nil {
