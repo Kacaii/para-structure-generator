@@ -63,7 +63,7 @@ func main() {
 		log.Fatal("Failed to write content to README files", err)
 	}
 
-	fmt.Printf("%sPARA Structure Generated Successfully Using Golang! 󱜙 ", GREEN) // All done!
+	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
 }
 
 // Writes content to the PARA Files
