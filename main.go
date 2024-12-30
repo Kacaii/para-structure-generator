@@ -8,47 +8,30 @@ import (
 )
 
 type paraFolder struct {
-	folderNumber string
-	folderName   string
-	fileName     string
-	fileContent  string
+	folderName  string
+	fileContent string
 }
 
-func main() {
-	baseDir := "PARA"
+// TODO: Add option to specify base directory
+var baseDir string = "PARA"
 
+func main() {
 	paraStructure := []paraFolder{
 		{
-			"01",
-			"PROJECTS",
-			"PROJECTS.md",
-			`## 01 - PROJECTS
-
-Contains files and resources related to active projects. Each project is tracked and managed here.`,
+			"01 PROJECTS",
+			"Stores notes and files for active, time-bound tasks or deliverables.",
 		},
 		{
-			"02",
-			"AREAS",
-			"AREAS.md",
-			`## 02 - AREAS
-
-Holds information about ongoing responsibilities and areas of focus.`,
+			"02 AREAS",
+			"Contains ongoing responsibilities or areas of interest.",
 		},
 		{
-			"03",
-			"RESOURCES",
-			"RESOURCES.md",
-			`## 03 - RESOURCES
-
-A collection of materials, references, and other helpful resources.`,
+			"03 RESOURCES",
+			"Holds general reference materials and reusable templates.",
 		},
 		{
-			"04",
-			"ARQUIVE",
-			"ARQUIVE.md",
-			`## 04 - ARQUIVE
-
-Archive for completed projects, inactive areas, or other no-longer-active items.`,
+			"04 ARQUIVE",
+			"Keeps inactive projects and outdated resources for future reference.",
 		},
 	}
 
@@ -60,15 +43,13 @@ Archive for completed projects, inactive areas, or other no-longer-active items.
 		}
 
 		// Create and write to file
-		filePath := filepath.Join(baseDir, folder.folderName, folder.fileName)
+		filePath := filepath.Join(baseDir, folder.folderName, "README.md")
 
 		err = os.WriteFile(filePath, []byte(folder.fileContent), os.ModePerm)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		fmt.Printf("%s Created successfully!\n", filePath)
 	}
 
-	fmt.Println("PARA structure generated successfully using Golang! 󱜙")
+	fmt.Println("PARA Structure Generated Successfully Using Golang! 󱜙 ")
 }
