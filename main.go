@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+const GREEN string = "\x1b[32m"
+
 type paraFolder struct {
 	folderName  string
 	fileContent string
@@ -49,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
+	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
 }
 
 // Writes content to the PARA Files
