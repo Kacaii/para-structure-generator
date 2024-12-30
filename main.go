@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -9,7 +10,10 @@ import (
 	"sync"
 )
 
-const GREEN string = "\x1b[32m"
+const (
+	GREEN string = "\x1b[32m"
+	RESET string = "\x1b[0m"
+)
 
 const (
 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
@@ -24,20 +28,29 @@ type paraDirectory struct {
 }
 
 func main() {
-	var baseDir string // Allows the user to select a base directory when generating the PARA structure
-	flag.StringVar(&baseDir, "dir", ".", "Select a path  to the base directory for the file structure to be generated 󰞋")
-	flag.Parse() // Allows the flags to be accessed by the program
-
-	err := validateBaseDir(baseDir)
-	if err != nil {
-		log.Fatalf("Invalid base directory: %v", err)
-	}
-
 	paraStructure := []paraDirectory{
 		{"01 PROJECTS", projectsDesc},
 		{"02 AREAS", areasDesc},
 		{"03 RESOURCES", resourcesDesc},
 		{"04 ARQUIVE", arquiveDesc},
+	}
+
+	var baseDir string // Allows the user to select a base directory when generating the PARA structure
+	flag.StringVar(&baseDir, "dir", ".", "Select a path  to the base directory for the file structure to be generated 󰞋")
+
+	var isTestingTree bool
+	flag.BoolVar(&isTestingTree, "tree", false, "Shows how the file structure will look like")
+
+	flag.Parse() // Allows the flags to be accessed by the program
+
+	if isTestingTree {
+		fmt.Println(showFileTree(baseDir, paraStructure)) // Shows the file tree for testing purpose.
+		os.Exit(0)
+	}
+
+	err := validateBaseDir(baseDir)
+	if err != nil {
+		log.Fatalln("Invalid base directory:", err)
 	}
 
 	if baseDir == "." {
@@ -69,7 +82,10 @@ func main() {
 
 	wg.Wait() // Waiting for every file to be written
 
-	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  ") // All done! 
+	fmt.Println("")
+	fmt.Println(showFileTree(baseDir, paraStructure))
+	fmt.Println("")
+	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  " + RESET) // All done! 
 }
 
 // Writes content to the PARA Files
@@ -95,7 +111,7 @@ func validateBaseDir(baseDir string) error {
 	// Information about the path provided
 	info, err := os.Stat(baseDir)
 	if os.IsNotExist(err) {
-		return fmt.Errorf("path does not exist: %s", baseDir)
+		return fmt.Errorf("selected path does not exist: %s", baseDir)
 	}
 
 	if err != nil {
@@ -107,4 +123,26 @@ func validateBaseDir(baseDir string) error {
 	}
 
 	return nil
+}
+
+func showFileTree(baseDir string, paraStructure []paraDirectory) string {
+	buf := bytes.Buffer{} // We are writing everything on here
+
+	fmt.Fprintln(&buf, baseDir+"/") // Writtes the base directory
+	fmt.Fprintln(&buf, "│")
+
+	// Writes the file tree showing each of the directories
+	for i, dir := range paraStructure {
+		// This just cheks if its the final one 󰣞
+		if i+1 != len(paraStructure) {
+			fmt.Fprintln(&buf, "├──", dir.name)
+			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README
+			fmt.Fprintln(&buf, "│")
+		} else {
+			fmt.Fprintln(&buf, "└──", dir.name)
+			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory
+		}
+	}
+
+	return buf.String() // Returning everything that was written on the buffer 
 }
