@@ -10,6 +10,13 @@ import (
 
 const GREEN string = "\x1b[32m"
 
+const (
+	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
+	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
+	resourcesDesc string = "Holds general reference materials and reusable templates."
+	arquiveDesc          = "Keeps inactive projects and outdated resources for future reference."
+)
+
 type paraDirectory struct {
 	name          string
 	readMeContent string
@@ -20,28 +27,33 @@ func main() {
 	flag.StringVar(&baseDir, "dir", ".", "Select a base directory for the structure to be generated")
 	flag.Parse() // Allows the flags to be accessed by the program
 
+	err := validateBaseDir(baseDir)
+	if err != nil {
+		log.Fatalf("Invalid base directory: %v", err)
+	}
+
 	paraStructure := []paraDirectory{
 		{
 			"01 PROJECTS",
-			"Stores notes and files for active, time-bound tasks or deliverables.",
+			projectsDesc,
 		},
 		{
 			"02 AREAS",
-			"Contains ongoing responsibilities or areas of interest.",
+			areasDesc,
 		},
 		{
 			"03 RESOURCES",
-			"Holds general reference materials and reusable templates.",
+			resourcesDesc,
 		},
 		{
 			"04 ARQUIVE",
-			"Keeps inactive projects and outdated resources for future reference.",
+			arquiveDesc,
 		},
 	}
 
 	fmt.Printf("Generating PARA structure in: %s \n", baseDir)
 
-	err := generateParaDirectories(paraStructure, baseDir)
+	err = generateParaDirectories(paraStructure, baseDir)
 	if err != nil {
 		log.Fatal("Failed to generate directories", err)
 	}
@@ -51,7 +63,7 @@ func main() {
 		log.Fatal("Failed to write content to README files", err)
 	}
 
-	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
+	fmt.Printf("%sPARA Structure Generated Successfully Using Golang! 󱜙 ", GREEN) // All done!
 }
 
 // Writes content to the PARA Files
@@ -77,6 +89,21 @@ func generateParaDirectories(structure []paraDirectory, baseDir string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func validateBaseDir(baseDir string) error {
+	info, err := os.Stat(baseDir)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("path does not exist: %s", baseDir)
+	}
+	if err != nil {
+		return fmt.Errorf("unable to access path: %v", err)
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("path is not a directory: %s", baseDir)
 	}
 
 	return nil
