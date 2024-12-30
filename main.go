@@ -10,9 +10,9 @@ import (
 
 const GREEN string = "\x1b[32m"
 
-type paraFolder struct {
-	folderName  string
-	fileContent string
+type paraDirectory struct {
+	name          string
+	readMeContent string
 }
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	flag.StringVar(&baseDir, "dir", ".", "Select a base directory for the structure to be generated")
 	flag.Parse() // Allows the flags to be accessed by the program
 
-	paraStructure := []paraFolder{
+	paraStructure := []paraDirectory{
 		{
 			"01 PROJECTS",
 			"Stores notes and files for active, time-bound tasks or deliverables.",
@@ -41,25 +41,25 @@ func main() {
 
 	fmt.Printf("Generating PARA structure in: %s \n", baseDir)
 
-	err := generateParaFolders(paraStructure, baseDir)
+	err := generateParaDirectories(paraStructure, baseDir)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to generate directories", err)
 	}
 
 	err = writeFileContent(paraStructure, baseDir)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to write content to README files", err)
 	}
 
 	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
 }
 
 // Writes content to the PARA Files
-func writeFileContent(paraStructure []paraFolder, baseDirectory string) error {
-	for _, folder := range paraStructure {
-		filePath := filepath.Join(baseDirectory, folder.folderName, "README.md")
+func writeFileContent(paraStructure []paraDirectory, baseDirectory string) error {
+	for _, dir := range paraStructure {
+		filePath := filepath.Join(baseDirectory, dir.name, "README.md")
 
-		err := os.WriteFile(filePath, []byte(folder.fileContent), os.ModePerm)
+		err := os.WriteFile(filePath, []byte(dir.readMeContent), os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -69,10 +69,11 @@ func writeFileContent(paraStructure []paraFolder, baseDirectory string) error {
 }
 
 // Generates the necessary Directories for the structure: PROJECTS, AREAS, RESOURCES and ARQUIVE
-func generateParaFolders(structure []paraFolder, baseDir string) error {
-	for _, folder := range structure {
-		// Creates the directories
-		err := os.MkdirAll(filepath.Join(baseDir, folder.folderName), os.ModePerm)
+func generateParaDirectories(structure []paraDirectory, baseDir string) error {
+	for _, dir := range structure {
+		pathToDirectory := filepath.Join(baseDir, dir.name)
+
+		err := os.MkdirAll(pathToDirectory, os.ModePerm)
 		if err != nil {
 			return err
 		}
