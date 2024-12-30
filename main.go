@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,10 +13,13 @@ type paraFolder struct {
 	fileContent string
 }
 
-// TODO: Add option to specify base directory
-var baseDir string = "."
+var baseDir string
 
 func main() {
+	// Allows the user to select a base directory to generate the structure
+	flag.StringVar(&baseDir, "dir", ".", "Select a base directory for the structure to be generated")
+	flag.Parse() // Allows the flags to be accessed by the program
+
 	paraStructure := []paraFolder{
 		{
 			"01 PROJECTS",
@@ -50,7 +54,7 @@ func main() {
 	fmt.Println("PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
 }
 
-// Writes the brief summary in all files
+// Writes content to the PARA Files
 func writeFileContent(paraStructure []paraFolder) error {
 	for _, folder := range paraStructure {
 		filePath := filepath.Join(baseDir, folder.folderName, "README.md")
@@ -64,7 +68,7 @@ func writeFileContent(paraStructure []paraFolder) error {
 	return nil
 }
 
-// Generates the necessary folders for the structure
+// Generates the necessary Directories for the structure: PROJECTS, AREAS, RESOURCES and ARQUIVE
 func generateParaFolders(structure []paraFolder) error {
 	for _, folder := range structure {
 		// Creates the directories
@@ -72,7 +76,6 @@ func generateParaFolders(structure []paraFolder) error {
 		if err != nil {
 			return err
 		}
-
 	}
 
 	return nil
