@@ -13,7 +13,7 @@ type paraFolder struct {
 }
 
 // TODO: Add option to specify base directory
-var baseDir string = "PARA"
+var baseDir string = "."
 
 func main() {
 	paraStructure := []paraFolder{
@@ -35,21 +35,43 @@ func main() {
 		},
 	}
 
-	for _, folder := range paraStructure {
-		// Creates the directories
-		err := os.MkdirAll(filepath.Join(baseDir, folder.folderName), os.ModePerm)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err := generateParaFolders(paraStructure)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		// Create and write to file
+	err = writeFileContent(paraStructure)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("PARA Structure Generated Successfully Using Golang! 󱜙 ") // All done!
+}
+
+// Writes the brief summary in all files
+func writeFileContent(paraStructure []paraFolder) error {
+	for _, folder := range paraStructure {
 		filePath := filepath.Join(baseDir, folder.folderName, "README.md")
 
-		err = os.WriteFile(filePath, []byte(folder.fileContent), os.ModePerm)
+		err := os.WriteFile(filePath, []byte(folder.fileContent), os.ModePerm)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
-	fmt.Println("PARA Structure Generated Successfully Using Golang! 󱜙 ")
+	return nil
+}
+
+// Generates the necessary folders for the structure
+func generateParaFolders(structure []paraFolder) error {
+	for _, folder := range structure {
+		// Creates the directories
+		err := os.MkdirAll(filepath.Join(baseDir, folder.folderName), os.ModePerm)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }
