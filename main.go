@@ -33,22 +33,10 @@ func main() {
 	}
 
 	paraStructure := []paraDirectory{
-		{
-			"01 PROJECTS",
-			projectsDesc,
-		},
-		{
-			"02 AREAS",
-			areasDesc,
-		},
-		{
-			"03 RESOURCES",
-			resourcesDesc,
-		},
-		{
-			"04 ARQUIVE",
-			arquiveDesc,
-		},
+		{"01 PROJECTS", projectsDesc},
+		{"02 AREAS", areasDesc},
+		{"03 RESOURCES", resourcesDesc},
+		{"04 ARQUIVE", arquiveDesc},
 	}
 
 	fmt.Printf("Generating PARA structure in: %s \n", baseDir) // Feedback message for the user.
