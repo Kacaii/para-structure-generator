@@ -35,15 +35,9 @@ func main() {
 		{"04 ARQUIVE", arquiveDesc},
 	}
 
-	var baseDir string // Allows the user to select a base directory when generating the PARA structure
-	flag.StringVar(&baseDir, "dir", ".", "Select a path  to the base directory for the file structure to be generated 󰞋")
+	baseDir, previewTree := handleFlags() // Allows the flags to be accessed by the program
 
-	var isTestingTree bool
-	flag.BoolVar(&isTestingTree, "tree", false, "Shows how the file structure will look like")
-
-	flag.Parse() // Allows the flags to be accessed by the program
-
-	if isTestingTree {
+	if previewTree {
 		fmt.Println(showFileTree(baseDir, paraStructure)) // Shows the file tree for testing purpose.
 		os.Exit(0)
 	}
@@ -86,6 +80,15 @@ func main() {
 	fmt.Println(showFileTree(baseDir, paraStructure))
 	fmt.Println("")
 	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  " + RESET) // All done! 
+}
+
+func handleFlags() (baseDir string, previewTree bool) {
+	flag.StringVar(&baseDir, "dir", ".", "Base directory for generating the File Structure")
+	flag.BoolVar(&previewTree, "tree", false, "Preview the File Structure without creating it")
+
+	flag.Parse()
+
+	return baseDir, previewTree
 }
 
 // Writes content to the PARA Files
@@ -131,18 +134,17 @@ func showFileTree(baseDir string, paraStructure []paraDirectory) string {
 	fmt.Fprintln(&buf, baseDir+"/") // Writtes the base directory
 	fmt.Fprintln(&buf, "│")
 
-	// Writes the file tree showing each of the directories
+	// Previews the file tree showing each of its directories
 	for i, dir := range paraStructure {
-		// This just cheks if its the final one 󰣞
 		if i+1 != len(paraStructure) {
-			fmt.Fprintln(&buf, "├──", dir.name)
-			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README
+			fmt.Fprintln(&buf, "├──", dir.name+"/")
+			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README file
 			fmt.Fprintln(&buf, "│")
 		} else {
-			fmt.Fprintln(&buf, "└──", dir.name)
+			fmt.Fprintln(&buf, "└──", dir.name+"/")    // Final directory
 			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory
 		}
 	}
 
-	return buf.String() // Returning everything that was written on the buffer 
+	return buf.String() // Returns everything that was written on the buffer 
 }
