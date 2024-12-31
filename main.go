@@ -42,8 +42,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := validateBaseDir(baseDir)
-	if err != nil {
+	if err := validateBaseDir(baseDir); err != nil {
 		log.Fatalln("Invalid base directory:", err)
 	}
 
@@ -58,20 +57,18 @@ func main() {
 		// Add one (1) to the waitGroups for every directory in the structure
 		wg.Add(1)
 
-		// Spawn goroutines  to generate the whole file structure
-		go func(d paraDirectory) {
+		// Spawning goroutines
+		go func() {
 			defer wg.Done()
 
-			err = generateParaDirectory(d, baseDir)
-			if err != nil {
-				log.Println("Failed to create directory:", d.name, err.Error())
+			if err := generateParaDirectory(dir, baseDir); err != nil {
+				log.Println("Failed to create directory:", dir.name, err.Error())
 			}
 
-			err = writeReadme(d, baseDir)
-			if err != nil {
-				log.Println("Failed to write README for:", d.name, err.Error())
+			if err := writeReadme(dir, baseDir); err != nil {
+				log.Println("Failed to write README for:", dir.name, err.Error())
 			}
-		}(dir) // Passing every directory from the structure as an arguemnt to the function
+		}() // Passing every directory from the structure as an arguemnt to the function
 	}
 
 	wg.Wait() // Waiting for every file to be written
@@ -93,10 +90,11 @@ func handleFlags() (baseDir string, previewTree bool) {
 
 // Writes content to the PARA Files
 func writeReadme(dir paraDirectory, baseDirectory string) error {
+	// First we need to path to the README file
 	filePath := filepath.Join(baseDirectory, dir.name, "README.md")
-	// Writing contents to the README files
-	err := os.WriteFile(filePath, []byte(dir.readMeContent), os.ModePerm)
-	if err != nil {
+
+	// Then we write the contents to it
+	if err := os.WriteFile(filePath, []byte(dir.readMeContent), os.ModePerm); err != nil {
 		return err
 	}
 
@@ -113,6 +111,7 @@ func generateParaDirectory(dir paraDirectory, baseDir string) error {
 func validateBaseDir(baseDir string) error {
 	// Information about the path provided
 	info, err := os.Stat(baseDir)
+
 	if os.IsNotExist(err) {
 		return fmt.Errorf("selected path does not exist: %s", baseDir)
 	}
