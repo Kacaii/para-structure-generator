@@ -19,7 +19,7 @@ const (
 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
 	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
 	resourcesDesc string = "Holds general reference materials and reusable templates."
-	arquiveDesc          = "Keeps inactive projects and outdated resources for future reference."
+	arquiveDesc   string = "Keeps inactive projects and outdated resources for future reference."
 )
 
 type paraDirectory struct {
