@@ -10,11 +10,13 @@ import (
 	"sync"
 )
 
+// For stylizing the text
 const (
 	GREEN string = "\x1b[32m"
 	RESET string = "\x1b[0m"
 )
 
+// Storing values in variables o they can be easily changed.
 const (
 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
 	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
@@ -23,11 +25,12 @@ const (
 )
 
 type paraDirectory struct {
-	name          string
-	readMeContent string
+	name          string // The name of the Directory: Projects, Areas, Resources and Arquive
+	readMeContent string // A brief summary about what the directory should contain
 }
 
 func main() {
+	// A slice of directories will be used for creating the file tree structure
 	paraStructure := []paraDirectory{
 		{"01 PROJECTS", projectsDesc},
 		{"02 AREAS", areasDesc},
@@ -68,15 +71,15 @@ func main() {
 			if err := writeReadme(dir, baseDir); err != nil {
 				log.Println("Failed to write README for:", dir.name, err.Error())
 			}
-		}() // Passing every directory from the structure as an arguemnt to the function
+		}()
 	}
 
-	wg.Wait() // Waiting for every file to be written
+	wg.Wait() // Waiting for the file structure to be generated 󰙴
 
 	fmt.Println("")
 	fmt.Println(showFileTree(baseDir, paraStructure))
 	fmt.Println("")
-	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  " + RESET) // All done! 
+	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  " + RESET) // All done! 
 }
 
 func handleFlags() (baseDir string, previewTree bool) {
@@ -88,7 +91,7 @@ func handleFlags() (baseDir string, previewTree bool) {
 	return baseDir, previewTree
 }
 
-// Writes content to the PARA Files
+// Writes content to the README Files
 func writeReadme(dir paraDirectory, baseDirectory string) error {
 	// First we need to path to the README file
 	filePath := filepath.Join(baseDirectory, dir.name, "README.md")
@@ -124,13 +127,13 @@ func validateBaseDir(baseDir string) error {
 		return fmt.Errorf("path is not a directory: %s", baseDir)
 	}
 
-	return nil
+	return nil // If nothing goes wrong, return nil
 }
 
 func showFileTree(baseDir string, paraStructure []paraDirectory) string {
 	buf := bytes.Buffer{} // We are writing everything on here
 
-	fmt.Fprintln(&buf, baseDir+"/") // Writtes the base directory
+	fmt.Fprintln(&buf, baseDir+"/") // Base directory
 	fmt.Fprintln(&buf, "│")
 
 	// Previews the file tree showing each of its directories
