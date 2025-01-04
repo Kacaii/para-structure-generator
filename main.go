@@ -1,3 +1,8 @@
+// Package main provides a utility for generating a PARA directory structure.
+// The PARA method (Projects, Areas, Resources, and Archive) is a framework for
+// organizing files and notes effectively. This package allows you to generate
+// the structure in a specified base directory and optionally preview it
+// beforehand.
 package main
 
 import (
@@ -10,13 +15,13 @@ import (
 	"sync"
 )
 
-// For stylizing the text
+// Constants for stylizing the text output.
 const (
-	GREEN string = "\x1b[32m"
-	RESET string = "\x1b[0m"
+	greenColor string = "\x1b[32m"
+	resetColor string = "\x1b[0m"
 )
 
-// Storing values in variables o they can be easily changed.
+// Descriptions for the PARA directories.
 const (
 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
 	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
@@ -24,24 +29,26 @@ const (
 	arquiveDesc   string = "Keeps inactive projects and outdated resources for future reference."
 )
 
-type paraDirectory struct {
-	name          string // The name of the Directory: Projects, Areas, Resources and Arquive
-	readMeContent string // A brief summary about what the directory should contain
+// ParaDirectory defines a directory in the PARA structure with a name and description.
+type ParaDirectory struct {
+	Name          string // Name of the Directory
+	ReadMeContent string // Content for the README.md file
 }
 
+// main is the entry point of the program.
 func main() {
-	// A slice of directories will be used for creating the file tree structure
-	paraStructure := []paraDirectory{
+	// Define the PARA structure
+	paraStructure := []ParaDirectory{
 		{"01 PROJECTS", projectsDesc},
 		{"02 AREAS", areasDesc},
 		{"03 RESOURCES", resourcesDesc},
 		{"04 ARQUIVE", arquiveDesc},
 	}
 
-	baseDir, previewTree := handleFlags() // Allows the flags to be accessed by the program
+	baseDir, previewTree := HandleFlags() // Parse the command-line flags.
 
 	if previewTree {
-		fmt.Println(showFileTree(baseDir, paraStructure)) // Shows the file tree for testing purpose.
+		fmt.Println(ShowFileTree(baseDir, paraStructure)) // Show the file tree for preview.
 		os.Exit(0)
 	}
 
@@ -57,32 +64,33 @@ func main() {
 
 	var wg sync.WaitGroup
 	for _, dir := range paraStructure {
-		// Add one (1) to the waitGroups for every directory in the structure
+		// Add one (1) to the waitGroups for every directory in the structure.
 		wg.Add(1)
 
 		// Spawning goroutines
 		go func() {
 			defer wg.Done()
 
-			if err := generateParaDirectory(dir, baseDir); err != nil {
-				log.Println("Failed to create directory:", dir.name, err.Error())
+			if err := GenerateParaDirectory(dir, baseDir); err != nil {
+				log.Println("Failed to create directory:", dir.Name, err.Error())
 			}
 
-			if err := writeReadme(dir, baseDir); err != nil {
-				log.Println("Failed to write README for:", dir.name, err.Error())
+			if err := WriteReadme(dir, baseDir); err != nil {
+				log.Println("Failed to write README for:", dir.Name, err.Error())
 			}
 		}()
 	}
 
-	wg.Wait() // Waiting for the file structure to be generated 󰙴
+	wg.Wait() // Waiting for all goroutines to finish.
 
 	fmt.Println("")
-	fmt.Println(showFileTree(baseDir, paraStructure))
+	fmt.Println(ShowFileTree(baseDir, paraStructure))
 	fmt.Println("")
-	fmt.Println(GREEN + "PARA Structure Generated Successfully Using Golang! 󱜙  " + RESET) // All done! 
+	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
 }
 
-func handleFlags() (baseDir string, previewTree bool) {
+// HandleFlags parses and returns command-line flags for the base directory and preview option.
+func HandleFlags() (baseDir string, previewTree bool) {
 	flag.StringVar(&baseDir, "dir", ".", "Base directory for generating the File Structure")
 	flag.BoolVar(&previewTree, "tree", false, "Preview the File Structure without creating it")
 
@@ -91,26 +99,26 @@ func handleFlags() (baseDir string, previewTree bool) {
 	return baseDir, previewTree
 }
 
-// Writes content to the README Files
-func writeReadme(dir paraDirectory, baseDirectory string) error {
-	// First we need to path to the README file
-	filePath := filepath.Join(baseDirectory, dir.name, "README.md")
+// WriteReadme writes the content to a README.md file in the specified directory.
+func WriteReadme(dir ParaDirectory, baseDirectory string) error {
+	// First we need to path to the README file.
+	filePath := filepath.Join(baseDirectory, dir.Name, "README.md")
 
-	// Then we write the contents to it
-	if err := os.WriteFile(filePath, []byte(dir.readMeContent), os.ModePerm); err != nil {
+	// Then we write the contents to it.
+	if err := os.WriteFile(filePath, []byte(dir.ReadMeContent), os.ModePerm); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Generates the necessary Directories for the structure: PROJECTS, AREAS, RESOURCES and ARQUIVE
-func generateParaDirectory(dir paraDirectory, baseDir string) error {
-	pathToDirectory := filepath.Join(baseDir, dir.name)
+// GenerateParaDirectory creates the directory for the specified paraDirectory.
+func GenerateParaDirectory(dir ParaDirectory, baseDir string) error {
+	pathToDirectory := filepath.Join(baseDir, dir.Name)
 	return os.MkdirAll(pathToDirectory, os.ModePerm)
 }
 
-// Returns an error if the path provided dont exist or if is not a directory.
+// validateBaseDir checks if the provided base directory is valid and accessible.
 func validateBaseDir(baseDir string) error {
 	// Information about the path provided
 	info, err := os.Stat(baseDir)
@@ -127,23 +135,24 @@ func validateBaseDir(baseDir string) error {
 		return fmt.Errorf("path is not a directory: %s", baseDir)
 	}
 
-	return nil // If nothing goes wrong, return nil
+	return nil // If nothing goes wrong, return nil.
 }
 
-func showFileTree(baseDir string, paraStructure []paraDirectory) string {
-	buf := bytes.Buffer{} // We are writing everything on here
+// ShowFileTree returns a string representation of the PARA file structure.
+func ShowFileTree(baseDir string, paraStructure []ParaDirectory) string {
+	buf := bytes.Buffer{} // We are writing everything on here.
 
-	fmt.Fprintln(&buf, baseDir+"/") // Base directory
+	fmt.Fprintln(&buf, baseDir+"/") // Base directory.
 	fmt.Fprintln(&buf, "│")
 
 	// Previews the file tree showing each of its directories
 	for i, dir := range paraStructure {
 		if i+1 != len(paraStructure) {
-			fmt.Fprintln(&buf, "├──", dir.name+"/")
+			fmt.Fprintln(&buf, "├──", dir.Name+"/")
 			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README file
 			fmt.Fprintln(&buf, "│")
 		} else {
-			fmt.Fprintln(&buf, "└──", dir.name+"/")    // Final directory
+			fmt.Fprintln(&buf, "└──", dir.Name+"/")    // Final directory
 			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory
 		}
 	}
