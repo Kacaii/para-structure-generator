@@ -8,19 +8,20 @@ package main
 import (
 	"bytes"
 	_ "embed"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/BurntSushi/toml"
 )
 
 // Its embedded into the binary, so its always available.
 //
-//go:embed directories.json
-var data string
+//go:embed directories.toml
+var config string
 
 // Constants for stylizing the text output.
 const (
@@ -30,22 +31,27 @@ const (
 
 // ParaDirectory defines a directory in the PARA structure with a name and description.
 type ParaDirectory struct {
-	Name          string `json:"name"`           // Name of the Directory
-	ReadMeContent string `json:"readme_content"` // Content for the README.md file
+	Name          string `toml:"name"`           // Name of the Directory
+	ReadMeContent string `toml:"readme_content"` // Content for the README.md file
+}
+
+// ParaStructure contains all the necessary information for the script to work
+type ParaStructure struct {
+	Directories []ParaDirectory `toml:"directories"` // Needs to be an Exported field so the other libraries can detect it
 }
 
 // main is the entry point of the program.
 func main() {
-	// paraStructure contains all the necessary information for the script to work
-	var paraStructure []ParaDirectory
-	if err := json.Unmarshal([]byte(data), &paraStructure); err != nil {
-		log.Fatal("Error parsing json file:", err)
+	var paraStructure ParaStructure
+
+	if err := toml.Unmarshal([]byte(config), &paraStructure); err != nil {
+		log.Fatal("Error parsing TOML file:", err)
 	}
 
 	baseDir, previewTree := HandleFlags() // Parse the command-line flags.
 
 	if previewTree {
-		fmt.Println(ShowFileTree(baseDir, paraStructure)) // Show the file tree for preview.
+		fmt.Println(ShowFileTree(baseDir, paraStructure.Directories)) // Show the file tree for preview.
 		os.Exit(0)
 	}
 
@@ -60,7 +66,7 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	for _, dir := range paraStructure {
+	for _, dir := range paraStructure.Directories {
 		// Add one (1) to the waitGroups for every directory in the structure.
 		wg.Add(1)
 
@@ -81,7 +87,7 @@ func main() {
 	wg.Wait() // Waiting for all goroutines to finish.
 
 	fmt.Println("")
-	fmt.Println(ShowFileTree(baseDir, paraStructure))
+	fmt.Println(ShowFileTree(baseDir, paraStructure.Directories))
 	fmt.Println("")
 	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
 }
@@ -136,15 +142,15 @@ func validateBaseDir(baseDir string) error {
 }
 
 // ShowFileTree returns a string representation of the PARA file structure.
-func ShowFileTree(baseDir string, paraStructure []ParaDirectory) string {
+func ShowFileTree(baseDir string, paraDirectories []ParaDirectory) string {
 	buf := bytes.Buffer{} // We are writing everything on here.
 
 	fmt.Fprintln(&buf, baseDir+"/") // Base directory.
 	fmt.Fprintln(&buf, "│")
 
 	// Previews the file tree showing each of its directories
-	for i, dir := range paraStructure {
-		if i+1 != len(paraStructure) {
+	for i, dir := range paraDirectories {
+		if i+1 != len(paraDirectories) {
 			fmt.Fprintln(&buf, "├──", dir.Name+"/")
 			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README file
 			fmt.Fprintln(&buf, "│")
