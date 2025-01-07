@@ -20,7 +20,7 @@ import (
 
 // Its embedded into the binary, so its always available.
 //
-//go:embed directories.toml
+//go:embed config.toml
 var config string
 
 // Constants for stylizing the text output.
