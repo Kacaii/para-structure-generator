@@ -1,0 +1,18 @@
+[
+  {
+    "name": "01 PROJECTS",
+    "readme_content": "Stores notes and files for active, time-bound tasks or deliverables."
+  },
+  {
+    "name": "02 AREAS",
+    "readme_content": "Contains ongoing responsibilities or areas of interest."
+  },
+  {
+    "name": "03 RESOURCES",
+    "readme_content": "Holds general reference materials and reusable templates."
+  },
+  {
+    "name": "04 ARQUIVE",
+    "readme_content": "Keeps inactive projects and outdated resources for future reference."
+  }
+]

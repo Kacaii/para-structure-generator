@@ -7,6 +7,8 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -15,6 +17,9 @@ import (
 	"sync"
 )
 
+//go:embed directories.json
+var data string
+
 // Constants for stylizing the text output.
 const (
 	greenColor string = "\x1b[32m"
@@ -22,27 +27,27 @@ const (
 )
 
 // Descriptions for the PARA directories.
-const (
-	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
-	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
-	resourcesDesc string = "Holds general reference materials and reusable templates."
-	arquiveDesc   string = "Keeps inactive projects and outdated resources for future reference."
-)
+// const (
+// 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
+// 	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
+// 	resourcesDesc string = "Holds general reference materials and reusable templates."
+// 	arquiveDesc   string = "Keeps inactive projects and outdated resources for future reference."
+// )
 
 // ParaDirectory defines a directory in the PARA structure with a name and description.
 type ParaDirectory struct {
-	Name          string // Name of the Directory
-	ReadMeContent string // Content for the README.md file
+	Name          string `json:"name"`           // Name of the Directory
+	ReadMeContent string `json:"readme_content"` // Content for the README.md file
 }
+
+// ParaStructure is an slice containing all required information about how the structure should look like.
+type ParaStructure []ParaDirectory
 
 // main is the entry point of the program.
 func main() {
-	// Define the PARA structure
-	paraStructure := []ParaDirectory{
-		{"01 PROJECTS", projectsDesc},
-		{"02 AREAS", areasDesc},
-		{"03 RESOURCES", resourcesDesc},
-		{"04 ARQUIVE", arquiveDesc},
+	var paraStructure ParaStructure
+	if err := json.Unmarshal([]byte(data), &paraStructure); err != nil {
+		log.Fatal("Error parsing json file:", err)
 	}
 
 	baseDir, previewTree := HandleFlags() // Parse the command-line flags.
