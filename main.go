@@ -17,6 +17,8 @@ import (
 	"sync"
 )
 
+// Its embedded into the binary, so its always available.
+//
 //go:embed directories.json
 var data string
 
@@ -26,26 +28,16 @@ const (
 	resetColor string = "\x1b[0m"
 )
 
-// Descriptions for the PARA directories.
-// const (
-// 	projectsDesc  string = "Stores notes and files for active, time-bound tasks or deliverables."
-// 	areasDesc     string = "Contains ongoing responsibilities or areas of interest."
-// 	resourcesDesc string = "Holds general reference materials and reusable templates."
-// 	arquiveDesc   string = "Keeps inactive projects and outdated resources for future reference."
-// )
-
 // ParaDirectory defines a directory in the PARA structure with a name and description.
 type ParaDirectory struct {
 	Name          string `json:"name"`           // Name of the Directory
 	ReadMeContent string `json:"readme_content"` // Content for the README.md file
 }
 
-// ParaStructure is an slice containing all required information about how the structure should look like.
-type ParaStructure []ParaDirectory
-
 // main is the entry point of the program.
 func main() {
-	var paraStructure ParaStructure
+	// paraStructure contains all the necessary information for the script to work
+	var paraStructure []ParaDirectory
 	if err := json.Unmarshal([]byte(data), &paraStructure); err != nil {
 		log.Fatal("Error parsing json file:", err)
 	}
