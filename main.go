@@ -8,6 +8,7 @@ package main
 import (
 	"bytes"
 	_ "embed"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -16,11 +17,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 )
-
-// Its embedded into the binary, so its always available.
-//
-//go:embed config.toml
-var config string
 
 // Constants for stylizing the text output.
 const (
@@ -39,20 +35,57 @@ type ParaStructure struct {
 	Directories []ParaDirectory `toml:"directories"` // Needs to be an Exported field so the other libraries can detect it
 }
 
-// main is the entry point of the program.
-func main() {
-	var paraStructure ParaStructure
+// Its embedded into the binary, so its always available.
+//
+//go:embed config.toml
+var config string
 
+func newParaStructure() *ParaStructure {
+	var paraStructure ParaStructure
 	if err := toml.Unmarshal([]byte(config), &paraStructure); err != nil {
 		log.Fatal("Error parsing TOML file:", err)
 	}
 
-	if len(os.Args) != 2 {
-		log.Fatal("Please select a base directory")
+	return &paraStructure
+}
+
+// main is the entry point of the program.
+func main() {
+	paraStructure := newParaStructure() // Parsing config
+
+	// Define the "create" subcommand and its flags
+	createCmd := flag.NewFlagSet("create", flag.ExitOnError)
+	baseDir := createCmd.String("b", ".", "Base directory for generating the structure")
+
+	// Define the global -h flag
+	printHelp := flag.Bool("h", false, "Prints the help message")
+
+	// Parse the global flags
+	flag.Parse()
+
+	if *printHelp {
+		flag.Usage()
+		createCmd.Usage()
+		os.Exit(0)
 	}
 
-	baseDir := os.Args[1]
+	if len(os.Args) < 2 {
+		log.Fatal("Expected 'create' subcommand")
+	}
 
+	// Checks for subcommand
+	switch os.Args[1] {
+	case "create":
+		createCmd.Parse(os.Args[2:]) // parses the flags for the "create" subcommand
+		HandleCreate(*baseDir, *paraStructure)
+	default:
+		fmt.Println("Unknown subcommand")
+		os.Exit(1)
+	}
+}
+
+// HandleCreate validades the base directory and generates the file structure 󰔱
+func HandleCreate(baseDir string, paraStructure ParaStructure) {
 	if err := validateBaseDir(baseDir); err != nil {
 		log.Fatalln("Invalid base directory:", err)
 	}
