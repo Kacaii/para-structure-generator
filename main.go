@@ -8,7 +8,6 @@ package main
 import (
 	"bytes"
 	_ "embed"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -48,12 +47,11 @@ func main() {
 		log.Fatal("Error parsing TOML file:", err)
 	}
 
-	baseDir, previewTree := HandleFlags() // Parse the command-line flags.
-
-	if previewTree {
-		fmt.Println(ShowFileTree(baseDir, paraStructure.Directories)) // Show the file tree for preview.
-		os.Exit(0)
+	if len(os.Args) != 2 {
+		log.Fatal("Please select a base directory")
 	}
+
+	baseDir := os.Args[1]
 
 	if err := validateBaseDir(baseDir); err != nil {
 		log.Fatalln("Invalid base directory:", err)
@@ -90,16 +88,6 @@ func main() {
 	fmt.Println(ShowFileTree(baseDir, paraStructure.Directories))
 	fmt.Println("")
 	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
-}
-
-// HandleFlags parses and returns command-line flags for the base directory and preview option.
-func HandleFlags() (baseDir string, previewTree bool) {
-	flag.StringVar(&baseDir, "dir", ".", "Base directory for generating the File Structure")
-	flag.BoolVar(&previewTree, "tree", false, "Preview the File Structure without creating it")
-
-	flag.Parse()
-
-	return baseDir, previewTree
 }
 
 // WriteReadme writes the content to a README.md file in the specified directory.
