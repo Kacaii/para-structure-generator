@@ -1,4 +1,4 @@
-// Package paradirectories provides custom types for structuring Para Method's Directories.
+// Package paradirectories provides custom types and functions for structuring PARA Method's Directories.
 package paradirectories
 
 import (
