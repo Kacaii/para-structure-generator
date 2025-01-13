@@ -11,10 +11,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
+	"strings"
 	"sync"
 
-	p "github.com/Kacaii/para-structure-generator/paraDirectories"
+	para "github.com/Kacaii/para-structure-generator/paraDirectories"
+	"golang.org/x/term"
 
 	"github.com/BurntSushi/toml"
 )
@@ -44,19 +45,21 @@ var (
 
 // main is the entry point of the program.
 func main() {
-	flag.Parse() // Parse the global flags
+	flag.Parse() // Parse the global flags 
 
-	var paraStructure p.ParaStructure
+	var paraStructure para.ParaStructure
 	if err := toml.Unmarshal([]byte(configFile), &paraStructure); err != nil {
 		log.Fatal("Error parsing TOML file:", err)
 	}
 
+	// Handle printing the help message 󰞋
 	if *printHelp {
-		flag.Usage()
-		createCmd.Usage()
-		os.Exit(0)
+		flag.Usage()      // Global Flags 
+		createCmd.Usage() // "Create" subcommand flags 
+		os.Exit(0)        // Exits the program
 	}
 
+	// User needs to provide a subcommand
 	if len(os.Args) < 2 {
 		log.Fatal("Expected 'create' subcommand")
 	}
@@ -64,7 +67,7 @@ func main() {
 	// Checks for subcommand
 	switch os.Args[1] {
 	case "create":
-		createCmd.Parse(os.Args[2:]) // parses the flags for the "create" subcommand
+		createCmd.Parse(os.Args[2:]) // Parse the flags for the "create" subcommand 
 		handleCreate(*baseDir, paraStructure)
 	default:
 		fmt.Println("Unknown subcommand")
@@ -73,7 +76,7 @@ func main() {
 }
 
 // handleCreate validades the base directory and generates the file structure 󰔱
-func handleCreate(baseDir string, paraStructure p.ParaStructure) {
+func handleCreate(baseDir string, paraStructure para.ParaStructure) {
 	if err := ValidateBaseDir(baseDir); err != nil {
 		log.Fatalln("Invalid base directory:", err)
 	}
@@ -93,11 +96,11 @@ func handleCreate(baseDir string, paraStructure p.ParaStructure) {
 		go func() {
 			defer wg.Done()
 
-			if err := GenerateParaDirectory(dir, baseDir); err != nil {
+			if err := para.GenerateParaDirectory(dir, baseDir); err != nil {
 				log.Println("Failed to create directory:", dir.Name, err.Error())
 			}
 
-			if err := WriteReadme(dir, baseDir); err != nil {
+			if err := para.WriteReadme(dir, baseDir); err != nil {
 				log.Println("Failed to write README for:", dir.Name, err.Error())
 			}
 		}()
@@ -105,29 +108,8 @@ func handleCreate(baseDir string, paraStructure p.ParaStructure) {
 
 	wg.Wait() // Waiting for all goroutines to finish.
 
-	fmt.Println("")
 	fmt.Println(ShowFileTree(baseDir, paraStructure.Directories))
-	fmt.Println("")
 	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
-}
-
-// WriteReadme writes the content to a README.md file in the specified directory.
-func WriteReadme(dir p.ParaDirectory, baseDirectory string) error {
-	// First we need to path to the README file.
-	filePath := filepath.Join(baseDirectory, dir.Name, "README.md")
-
-	// Then we write the contents to it.
-	if err := os.WriteFile(filePath, []byte(dir.ReadMeContent), os.ModePerm); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GenerateParaDirectory creates the directory for the specified paraDirectory.
-func GenerateParaDirectory(dir p.ParaDirectory, baseDir string) error {
-	pathToDirectory := filepath.Join(baseDir, dir.Name)
-	return os.MkdirAll(pathToDirectory, os.ModePerm)
 }
 
 // ValidateBaseDir checks if the provided base directory is valid and accessible.
@@ -151,9 +133,17 @@ func ValidateBaseDir(baseDir string) error {
 }
 
 // ShowFileTree returns a string representation of the PARA file structure.
-func ShowFileTree(baseDir string, paraDirectories []p.ParaDirectory) string {
+func ShowFileTree(baseDir string, paraDirectories []para.ParaDirectory) string {
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	buf := bytes.Buffer{} // We are writing everything on here.
 
+	fmt.Fprintln(&buf, "")
+	fmt.Fprintln(&buf, strings.Repeat("=", width))
+	fmt.Fprintln(&buf, "")
 	fmt.Fprintln(&buf, baseDir+"/") // Base directory.
 	fmt.Fprintln(&buf, "│")
 
@@ -168,6 +158,10 @@ func ShowFileTree(baseDir string, paraDirectories []p.ParaDirectory) string {
 			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory
 		}
 	}
+
+	fmt.Fprintln(&buf, "")
+	fmt.Fprintln(&buf, strings.Repeat("=", width))
+	fmt.Fprintln(&buf, "")
 
 	return buf.String() // Returns everything that was written on the buffer 
 }
