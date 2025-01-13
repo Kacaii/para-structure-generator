@@ -1,8 +1,7 @@
 // Package main provides a utility for generating a PARA directory structure.
 // The PARA method (Projects, Areas, Resources, and Archive) is a framework for
 // organizing files and notes effectively. This package allows you to generate
-// the structure in a specified base directory and optionally preview it
-// beforehand.
+// the structure in a specified base directory.
 package main
 
 import (
@@ -26,12 +25,12 @@ const (
 	resetColor string = "\x1b[0m"
 )
 
-var (
+// configFile is a TOML file embedded into the binary, so its always available. 
+//
+//go:embed config.toml
+var configFile string
 
-	// config is embedded into the binary, so its always available.
-	//
-	//go:embed config.toml
-	config string
+var (
 
 	// Define the "create" subcommand and its flags
 	createCmd = flag.NewFlagSet("create", flag.ExitOnError)
@@ -48,7 +47,7 @@ func main() {
 	flag.Parse() // Parse the global flags
 
 	var paraStructure p.ParaStructure
-	if err := toml.Unmarshal([]byte(config), &paraStructure); err != nil {
+	if err := toml.Unmarshal([]byte(configFile), &paraStructure); err != nil {
 		log.Fatal("Error parsing TOML file:", err)
 	}
 
