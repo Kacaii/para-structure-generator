@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"sync"
 
+	p "github.com/Kacaii/para-structure-generator/paraDirectories"
+
 	"github.com/BurntSushi/toml"
 )
 
@@ -24,44 +26,31 @@ const (
 	resetColor string = "\x1b[0m"
 )
 
-// ParaDirectory defines a directory in the PARA structure with a name and description.
-type ParaDirectory struct {
-	Name          string `toml:"name"`           // Name of the Directory
-	ReadMeContent string `toml:"readme_content"` // Content for the README.md file
-}
+var (
 
-// ParaStructure contains all the necessary information for the script to work
-type ParaStructure struct {
-	Directories []ParaDirectory `toml:"directories"` // Needs to be an Exported field so the other libraries can detect it
-}
+	// config is embedded into the binary, so its always available.
+	//
+	//go:embed config.toml
+	config string
 
-// Its embedded into the binary, so its always available.
-//
-//go:embed config.toml
-var config string
+	// Define the "create" subcommand and its flags
+	createCmd = flag.NewFlagSet("create", flag.ExitOnError)
 
-func newParaStructure() *ParaStructure {
-	var paraStructure ParaStructure
-	if err := toml.Unmarshal([]byte(config), &paraStructure); err != nil {
-		log.Fatal("Error parsing TOML file:", err)
-	}
+	// baseDir represents the directory where the structure will be generated
+	baseDir = createCmd.String("b", ".", "Base directory for generating the structure")
 
-	return &paraStructure
-}
+	// Define the global -h flag
+	printHelp = flag.Bool("h", false, "Prints the help message")
+)
 
 // main is the entry point of the program.
 func main() {
-	paraStructure := newParaStructure() // Parsing config
+	flag.Parse() // Parse the global flags
 
-	// Define the "create" subcommand and its flags
-	createCmd := flag.NewFlagSet("create", flag.ExitOnError)
-	baseDir := createCmd.String("b", ".", "Base directory for generating the structure")
-
-	// Define the global -h flag
-	printHelp := flag.Bool("h", false, "Prints the help message")
-
-	// Parse the global flags
-	flag.Parse()
+	var paraStructure p.ParaStructure
+	if err := toml.Unmarshal([]byte(config), &paraStructure); err != nil {
+		log.Fatal("Error parsing TOML file:", err)
+	}
 
 	if *printHelp {
 		flag.Usage()
@@ -77,16 +66,16 @@ func main() {
 	switch os.Args[1] {
 	case "create":
 		createCmd.Parse(os.Args[2:]) // parses the flags for the "create" subcommand
-		HandleCreate(*baseDir, *paraStructure)
+		handleCreate(*baseDir, paraStructure)
 	default:
 		fmt.Println("Unknown subcommand")
 		os.Exit(1)
 	}
 }
 
-// HandleCreate validades the base directory and generates the file structure 󰔱
-func HandleCreate(baseDir string, paraStructure ParaStructure) {
-	if err := validateBaseDir(baseDir); err != nil {
+// handleCreate validades the base directory and generates the file structure 󰔱
+func handleCreate(baseDir string, paraStructure p.ParaStructure) {
+	if err := ValidateBaseDir(baseDir); err != nil {
 		log.Fatalln("Invalid base directory:", err)
 	}
 
@@ -124,7 +113,7 @@ func HandleCreate(baseDir string, paraStructure ParaStructure) {
 }
 
 // WriteReadme writes the content to a README.md file in the specified directory.
-func WriteReadme(dir ParaDirectory, baseDirectory string) error {
+func WriteReadme(dir p.ParaDirectory, baseDirectory string) error {
 	// First we need to path to the README file.
 	filePath := filepath.Join(baseDirectory, dir.Name, "README.md")
 
@@ -137,13 +126,13 @@ func WriteReadme(dir ParaDirectory, baseDirectory string) error {
 }
 
 // GenerateParaDirectory creates the directory for the specified paraDirectory.
-func GenerateParaDirectory(dir ParaDirectory, baseDir string) error {
+func GenerateParaDirectory(dir p.ParaDirectory, baseDir string) error {
 	pathToDirectory := filepath.Join(baseDir, dir.Name)
 	return os.MkdirAll(pathToDirectory, os.ModePerm)
 }
 
-// validateBaseDir checks if the provided base directory is valid and accessible.
-func validateBaseDir(baseDir string) error {
+// ValidateBaseDir checks if the provided base directory is valid and accessible.
+func ValidateBaseDir(baseDir string) error {
 	// Information about the path provided
 	info, err := os.Stat(baseDir)
 
@@ -163,7 +152,7 @@ func validateBaseDir(baseDir string) error {
 }
 
 // ShowFileTree returns a string representation of the PARA file structure.
-func ShowFileTree(baseDir string, paraDirectories []ParaDirectory) string {
+func ShowFileTree(baseDir string, paraDirectories []p.ParaDirectory) string {
 	buf := bytes.Buffer{} // We are writing everything on here.
 
 	fmt.Fprintln(&buf, baseDir+"/") // Base directory.
