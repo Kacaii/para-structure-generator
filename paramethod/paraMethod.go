@@ -1,5 +1,5 @@
-// Package paradirectories provides custom types and functions for structuring PARA Method's Directories.
-package paradirectories
+// Package paramethod provides custom types and functions for structuring PARA Method's Directories.
+package paramethod
 
 import (
 	"bytes"
@@ -21,9 +21,9 @@ type (
 		ReadMeContent string `toml:"readme_content"`
 	}
 
-	// ParaStructure contains all the necessary information for the script to work.
-	ParaStructure struct {
-		// An array of ParaDirectories.
+	// ParaMethod contains all the necessary information for the script to work.
+	ParaMethod struct {
+		// Contains all necessary directories: [ PROJECTS, AREAS, RESOURCES, ARQUIVE ]
 		Directories []ParaDirectory `toml:"directories"`
 	}
 )
@@ -38,28 +38,34 @@ func WriteReadme(dir ParaDirectory, baseDirectory string) error {
 		return err
 	}
 
-	return nil
+	return nil // If nothing goes wrong, return nil.
 }
 
 // GenerateParaDirectory creates the directory for the specified paraDirectory.
 func GenerateParaDirectory(dir ParaDirectory, baseDir string) error {
+	// Path to the directory that we are generating.
 	pathToDirectory := filepath.Join(baseDir, dir.Name)
+
+	// Returns nil if no error ocurred.
 	return os.MkdirAll(pathToDirectory, os.ModePerm)
 }
 
 // ValidateBaseDir checks if the provided base directory is valid and accessible.
 func ValidateBaseDir(baseDir string) error {
-	// Information about the path provided
+	// Information about the path provided.
 	info, err := os.Stat(baseDir)
 
+	// If it doesnt exists.
 	if os.IsNotExist(err) {
 		return fmt.Errorf("selected path does not exist: %s", baseDir)
 	}
 
+	// If path isnt accessible.
 	if err != nil {
 		return fmt.Errorf("unable to access path: %v", err)
 	}
 
+	// If path is a file.
 	if !info.IsDir() {
 		return fmt.Errorf("path is not a directory: %s", baseDir)
 	}
@@ -69,15 +75,17 @@ func ValidateBaseDir(baseDir string) error {
 
 // ShowFileTree returns a string representation of the PARA file structure.
 func ShowFileTree(baseDir string, paraDirectories []ParaDirectory) string {
-	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	// terminalWidth stores the width of the terminal.
+	terminalWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	buf := bytes.Buffer{} // We are writing everything on here.
+	// Buffer to store the bytes that are going to be displayed in the terminal. 󰜦
+	buf := bytes.Buffer{} //
 
 	fmt.Fprintln(&buf, "")
-	fmt.Fprintln(&buf, strings.Repeat("=", width))
+	fmt.Fprintln(&buf, strings.Repeat("=", terminalWidth))
 	fmt.Fprintln(&buf, "")
 	fmt.Fprintln(&buf, baseDir+"/") // Base directory.
 	fmt.Fprintln(&buf, "│")
@@ -85,17 +93,17 @@ func ShowFileTree(baseDir string, paraDirectories []ParaDirectory) string {
 	// Previews the file tree showing each of its directories
 	for i, dir := range paraDirectories {
 		if i+1 != len(paraDirectories) {
-			fmt.Fprintln(&buf, "├──", dir.Name+"/")
-			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README file
+			fmt.Fprintln(&buf, "├──", dir.Name+"/")    // Directories 1, 2 and 3.
+			fmt.Fprintln(&buf, "│   └──", "README.md") // Every directory has a README file.
 			fmt.Fprintln(&buf, "│")
 		} else {
-			fmt.Fprintln(&buf, "└──", dir.Name+"/")    // Final directory
-			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory
+			fmt.Fprintln(&buf, "└──", dir.Name+"/")    // Final directory.
+			fmt.Fprintln(&buf, "    └──", "README.md") // README for the final directory.
 		}
 	}
 
 	fmt.Fprintln(&buf, "")
-	fmt.Fprintln(&buf, strings.Repeat("=", width))
+	fmt.Fprintln(&buf, strings.Repeat("=", terminalWidth))
 
-	return buf.String() // Returns everything that was written on the buffer 
+	return buf.String() // Returns everything that was written on the buffer. 
 }

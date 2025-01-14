@@ -12,12 +12,22 @@ import (
 	"os"
 	"sync"
 
-	para "github.com/Kacaii/para-structure-generator/paraDirectories"
+	p "github.com/Kacaii/para-structure-generator/paramethod"
 
 	"github.com/BurntSushi/toml"
 )
 
-// configFile is a TOML file embedded into the binary, so its always available. 
+// configFile is a TOML file embedded into the binary, so its always available. 
+//
+//		──────────────────
+//		  ├─  bin
+//	    │
+//		  ├─  config.toml
+//		  ├─  main.go
+//	    │
+//		  ├─  go.mod
+//		  └─  go.sum
+//		──────────────────
 //
 //go:embed config.toml
 var configFile string
@@ -31,12 +41,18 @@ const (
 var (
 
 	// Define the "create" subcommand and its flags
+	//
+	//  $ generate-para create [flags\]
 	createCmd = flag.NewFlagSet("create", flag.ExitOnError)
 
 	// baseDir represents the directory where the structure will be generated
+	//
+	//  $ generate-para create -b <base-directory>
 	baseDir = createCmd.String("b", ".", "Base directory for generating the structure")
 
 	// Define the global -h flag
+	//
+	//  $ generate-para -h
 	printHelp = flag.Bool("h", false, "Prints the help message")
 )
 
@@ -44,11 +60,7 @@ var (
 func main() {
 	flag.Parse() // Parse the global flags 
 
-	var paraStructure para.ParaStructure
-	// Parsing the embedded config file.
-	if err := toml.Unmarshal([]byte(configFile), &paraStructure); err != nil {
-		log.Fatal("Error parsing TOML file:", err)
-	}
+	paraMethod := parseTOML()
 
 	// Handle printing the help message 󰞋
 	if *printHelp {
@@ -66,27 +78,37 @@ func main() {
 	switch os.Args[1] {
 	case "create":
 		createCmd.Parse(os.Args[2:]) // Parse the flags for the "create" subcommand 
-		handleCreate(*baseDir, paraStructure)
+		handleCreate(*baseDir, paraMethod)
 	default:
 		fmt.Println("Unknown subcommand") // In case the user doesnt pass a subcommand.
 		os.Exit(1)
 	}
 }
 
+func parseTOML() p.ParaMethod {
+	var config p.ParaMethod
+	// Parsing the embedded config file.
+	if err := toml.Unmarshal([]byte(configFile), &config); err != nil {
+		log.Fatal("Error parsing TOML file:", err)
+	}
+
+	return config
+}
+
 // handleCreate validades the base directory and generates the file structure 󰔱
-func handleCreate(baseDir string, paraStructure para.ParaStructure) {
-	if err := para.ValidateBaseDir(baseDir); err != nil {
+func handleCreate(baseDirectory string, paraStructure p.ParaMethod) {
+	if err := p.ValidateBaseDir(baseDirectory); err != nil {
 		log.Fatalln("Invalid base directory:", err)
 	}
 
-	if baseDir == "." {
+	if baseDirectory == "." {
 		fmt.Println("Generating PARA structure in the current directory 󰣞")
 	} else {
-		fmt.Println("Generating PARA structure in:", baseDir, "󰣞")
+		fmt.Println("Generating PARA structure in:", baseDirectory, "󰣞")
 	}
 
 	var wg sync.WaitGroup
-	for _, dir := range paraStructure.Directories {
+	for _, paraDir := range paraStructure.Directories {
 		// Add one (1) to the waitGroup for every directory in the structure.
 		wg.Add(1)
 
@@ -95,13 +117,13 @@ func handleCreate(baseDir string, paraStructure para.ParaStructure) {
 			defer wg.Done()
 
 			// First we generate the directories.
-			if err := para.GenerateParaDirectory(dir, baseDir); err != nil {
-				log.Println("Failed to create directory:", dir.Name, err.Error())
+			if err := p.GenerateParaDirectory(paraDir, baseDirectory); err != nil {
+				log.Println("Failed to create directory:", paraDir.Name, err.Error())
 			}
 
 			// Then we create and write the README files.
-			if err := para.WriteReadme(dir, baseDir); err != nil {
-				log.Println("Failed to write README for:", dir.Name, err.Error())
+			if err := p.WriteReadme(paraDir, baseDirectory); err != nil {
+				log.Println("Failed to write README for:", paraDir.Name, err.Error())
 			}
 		}()
 	}
@@ -109,6 +131,6 @@ func handleCreate(baseDir string, paraStructure para.ParaStructure) {
 	wg.Wait() // Waiting for all goroutines to finish.
 
 	// And showing the result at te end.
-	fmt.Println(para.ShowFileTree(baseDir, paraStructure.Directories))
+	fmt.Println(p.ShowFileTree(baseDirectory, paraStructure.Directories))
 	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
 }
