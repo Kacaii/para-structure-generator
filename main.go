@@ -45,6 +45,7 @@ func main() {
 	flag.Parse() // Parse the global flags 
 
 	var paraStructure para.ParaStructure
+	// Parsing the embedded config file.
 	if err := toml.Unmarshal([]byte(configFile), &paraStructure); err != nil {
 		log.Fatal("Error parsing TOML file:", err)
 	}
@@ -67,7 +68,7 @@ func main() {
 		createCmd.Parse(os.Args[2:]) // Parse the flags for the "create" subcommand 
 		handleCreate(*baseDir, paraStructure)
 	default:
-		fmt.Println("Unknown subcommand")
+		fmt.Println("Unknown subcommand") // In case the user doesnt pass a subcommand.
 		os.Exit(1)
 	}
 }
@@ -86,17 +87,19 @@ func handleCreate(baseDir string, paraStructure para.ParaStructure) {
 
 	var wg sync.WaitGroup
 	for _, dir := range paraStructure.Directories {
-		// Add one (1) to the waitGroups for every directory in the structure.
+		// Add one (1) to the waitGroup for every directory in the structure.
 		wg.Add(1)
 
 		// Spawning goroutines
 		go func() {
 			defer wg.Done()
 
+			// First we generate the directories.
 			if err := para.GenerateParaDirectory(dir, baseDir); err != nil {
 				log.Println("Failed to create directory:", dir.Name, err.Error())
 			}
 
+			// Then we create and write the README files.
 			if err := para.WriteReadme(dir, baseDir); err != nil {
 				log.Println("Failed to write README for:", dir.Name, err.Error())
 			}
@@ -105,6 +108,7 @@ func handleCreate(baseDir string, paraStructure para.ParaStructure) {
 
 	wg.Wait() // Waiting for all goroutines to finish.
 
+	// And showing the result at te end.
 	fmt.Println(para.ShowFileTree(baseDir, paraStructure.Directories))
 	fmt.Println(greenColor + "PARA Structure Generated Successfully Using Golang! 󱜙  " + resetColor) // All done! 
 }

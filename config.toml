@@ -1,15 +1,15 @@
 [[directories]]
 name = "01 PROJECTS"
-readme_content = "Stores notes and files for active, time-bound tasks or deliverables."
+readme_content = "# PROJECTS\n\nStores notes and files for active, time-bound tasks or deliverables."
 
 [[directories]]
 name = "02 AREAS"
-readme_content = "Contains ongoing responsibilities or areas of interest."
+readme_content = "# AREAS\n\nContains ongoing responsibilities or areas of interest."
 
 [[directories]]
 name = "03 RESOURCES"
-readme_content = "Holds general reference materials and reusable templates."
+readme_content = "# RESOURCES\n\nHolds general reference materials and reusable templates."
 
 [[directories]]
 name = "04 ARQUIVE"
-readme_content = "Keeps inactive projects and outdated resources for future reference."
+readme_content = "# ARQUIVE\n\nKeeps inactive projects and outdated resources for future reference."
