@@ -96,7 +96,6 @@ func ShowFileTree(baseDir string, paraDirectories []ParaDirectory) string {
 
 	fmt.Fprintln(&buf, "")
 	fmt.Fprintln(&buf, strings.Repeat("=", width))
-	fmt.Fprintln(&buf, "")
 
 	return buf.String() // Returns everything that was written on the buffer 
 }
