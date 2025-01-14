@@ -1,27 +1,31 @@
 [[directories]]
-name = "01 PROJECTS"
+name = "01 PROJECTS" # Stores notes and files for active, time-bound tasks or deliverables.
 readme_content = """
-# PROJECTS
+# 01 PROJECTS
 
-Stores notes and files for active, time-bound tasks or deliverables."""
+Stores notes and files for active, time-bound tasks or deliverables.\
+"""
 
 [[directories]]
-name = "02 AREAS"
+name = "02 AREAS" # Contains ongoing responsibilities or areas of interest.
 readme_content = """
-# AREAS
+# 02 AREAS
 
-Contains ongoing responsibilities or areas of interest."""
+Contains ongoing responsibilities or areas of interest.\
+"""
 
 [[directories]]
-name = "03 RESOURCES"
+name = "03 RESOURCES" # Holds general reference materials and reusable templates.
 readme_content = """
-# RESOURCES
+# 03 RESOURCES
 
-Holds general reference materials and reusable templates."""
+Holds general reference materials and reusable templates.\
+"""
 
 [[directories]]
-name = "04 ARQUIVE"
+name = "04 ARQUIVE" # Keeps inactive projects and outdated resources for future reference.
 readme_content = """
-# ARQUIVE
+# 04 ARQUIVE
 
-Keeps inactive projects and outdated resources for future reference."""
+Keeps inactive projects and outdated resources for future reference.\
+"""
