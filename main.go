@@ -1,9 +1,10 @@
 /*
-Generate-para provides a utility for generating a PARA directory structure.
+Generate-para provides a utility for generating a PARA method structure.
 
 The PARA method (Projects, Areas, Resources, and Archive) is a framework for
 organizing files and notes effectively. This package allows you to generate
-the structure in a specified base directory.
+the structure in a specified base directory. It includes default README files
+summarizing whats each directory is used for.
 
 Usage:
 

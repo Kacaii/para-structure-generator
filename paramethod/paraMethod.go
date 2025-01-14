@@ -15,16 +15,13 @@ import (
 type (
 	// ParaDirectory defines a directory in the PARA structure with a name and description.
 	ParaDirectory struct {
-		// Name of the Directory.
-		Name string `toml:"name"`
-		// Content to be written to the README.md file inside every para folder.
-		ReadMeContent string `toml:"readme_content"`
+		Name          string `toml:"name"`           // Name of the Directory.
+		ReadMeContent string `toml:"readme_content"` // Content to be written to the README.md file inside every PARA directory.
 	}
 
 	// ParaMethod contains all the necessary information for the script to work.
 	ParaMethod struct {
-		// Contains all necessary directories: [ PROJECTS, AREAS, RESOURCES, ARQUIVE ]
-		Directories []ParaDirectory `toml:"directories"`
+		Directories []ParaDirectory `toml:"directories"` // [ PROJECTS, AREAS, RESOURCES, ARQUIVE ]
 	}
 )
 
