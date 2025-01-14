@@ -1,7 +1,34 @@
-// Package main provides a utility for generating a PARA directory structure.
-// The PARA method (Projects, Areas, Resources, and Archive) is a framework for
-// organizing files and notes effectively. This package allows you to generate
-// the structure in a specified base directory.
+/*
+Generate-para provides a utility for generating a PARA directory structure.
+
+The PARA method (Projects, Areas, Resources, and Archive) is a framework for
+organizing files and notes effectively. This package allows you to generate
+the structure in a specified base directory.
+
+Usage:
+
+	generate-para [flags] [subcommand] [subflags] [path ...]
+
+The flags are:
+
+	-h
+
+	    Prints the help message to the console.
+
+The subcommands are:
+
+	create [flags] [path ...]
+
+	    Generates the PARA structure in the specified path.
+	    Defaults to the current directory.
+
+The subflags for create are:
+
+	-b
+
+	    Specify the base directory for the structure to be generated.
+	    Defaults to the current directory.
+*/
 package main
 
 import (
@@ -42,17 +69,23 @@ var (
 
 	// Define the "create" subcommand and its flags
 	//
-	//  $ generate-para create [flags\]
+	// Usage:
+	//
+	//  generate-para create [flags] [path...]
 	createCmd = flag.NewFlagSet("create", flag.ExitOnError)
 
 	// baseDir represents the directory where the structure will be generated
 	//
-	//  $ generate-para create -b <base-directory>
+	// Usage:
+	//
+	//  generate-para create -b [base-directory]
 	baseDir = createCmd.String("b", ".", "Base directory for generating the structure")
 
 	// Define the global -h flag
 	//
-	//  $ generate-para -h
+	// Usage:
+	//
+	//  generate-para -h
 	printHelp = flag.Bool("h", false, "Prints the help message")
 )
 
