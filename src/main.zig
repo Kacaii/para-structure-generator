@@ -50,6 +50,9 @@ pub fn main() !void {
         dir_arquive, //     04 Arquive
     };
 
+    // Just adding a line feed, nothing fancy.
+    std.debug.print("\n", .{});
+
     // For every item on the para_directories array,
     // generate the respective directory, and write content to is
     // ReadME file.
