@@ -14,7 +14,7 @@ const areas = ParaDirectory{
     //
     .name = .Areas,
     .readme_content =
-    \\ # 02 AREAS
+    \\# 02 AREAS
     \\
     \\Contains ongoing responsibilities or areas of interest.
 };
@@ -30,7 +30,7 @@ const resources = ParaDirectory{
 
 const arquive = ParaDirectory{
     //
-    .name = .Resources,
+    .name = .Arquive,
     .readme_content =
     \\# 04 ARQUIVE
     \\
@@ -38,6 +38,7 @@ const arquive = ParaDirectory{
 };
 
 pub fn main() !void {
+    const cwd = std.fs.cwd();
     const directories = [4]ParaDirectory{
         //
         projects,
@@ -45,12 +46,19 @@ pub fn main() !void {
         resources,
         arquive,
     };
-    const cwd = std.fs.cwd();
 
     for (directories) |dir| {
         try cwd.makeDir(dir.getName());
-        const sub_dir = try cwd.openDir(dir.getName(), .{});
-        const file = try sub_dir.createFile("ReadME.md", .{});
-        try file.write(dir.readme_content);
+
+        var sub_dir = try cwd.openDir(dir.getName(), .{});
+        defer sub_dir.close();
+
+        const file = try sub_dir.createFile("README.md", .{});
+        defer file.close();
+
+        _ = try file.write(dir.readme_content);
+        std.debug.print("{s} generated! \n", .{dir.getName()});
     }
+
+    std.debug.print("\nAll done! You are ready to use your PARA method.\n", .{});
 }
