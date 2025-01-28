@@ -89,8 +89,8 @@ pub fn main() !void {
             std.debug.print("┃", .{});
         }
 
-        std.debug.print("    └╴ReadMe.md generated!\n", .{});
+        std.debug.print("    ┖╴ReadMe.md generated!\n", .{});
     }
 
-    std.debug.print("\n▒ All done! ▒\n", .{});
+    std.debug.print("\n▒ All done! ▒\n\n", .{});
 }
