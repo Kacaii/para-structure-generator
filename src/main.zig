@@ -85,7 +85,7 @@ pub fn main() !void {
         _ = try file.write(dir.readme_content);
 
         // Check for last directory. 
-        if (i == 3) {
+        if (i == para_directories.len - 1) {
             // If its the last one, the file tree ends.
             std.debug.print(" ", .{});
         } else {
