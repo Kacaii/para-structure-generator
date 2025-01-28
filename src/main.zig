@@ -32,11 +32,11 @@ const dir_resources = ParaDirectory{
 };
 
 /// Keeps inactive projects and outdated resources for future reference.
-const dir_arquive = ParaDirectory{
+const dir_archive = ParaDirectory{
     //
-    .name = .Arquive,
+    .name = .Archive,
     .readme_content =
-    \\# 04 ARQUIVE
+    \\# 04 ARCHIVE
     \\
     \\Keeps inactive projects and outdated resources for future reference.
 };
@@ -46,7 +46,7 @@ const para_directories = [4]ParaDirectory{
     dir_projects, //    01 Projects/
     dir_areas, //       02 Areas/
     dir_resources, //   03 Resources/
-    dir_arquive, //     04 Arquive/
+    dir_archive, //     04 Archive/
 };
 
 /// This is the entry point of the program.

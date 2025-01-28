@@ -7,7 +7,7 @@ const testing = std.testing;
 /// ParaDirectory defines a directory in the PARA structure with a name and description.
 pub const ParaDirectory = struct {
     /// Name of the Directory.
-    name: union(enum) { Projects, Areas, Resources, Arquive },
+    name: union(enum) { Projects, Areas, Resources, Archive },
 
     /// Content to be written to the README.md file inside every PARA directory.
     readme_content: []const u8,
@@ -21,7 +21,7 @@ pub const ParaDirectory = struct {
             .Projects => "01 PROJECTS",
             .Areas => "02 AREAS",
             .Resources => "03 RESOURCES",
-            .Arquive => "04 ARQUIVE",
+            .Archive => "04 ARCHIVE",
         };
     }
 };
@@ -48,10 +48,10 @@ test "getName" {
     };
     try testing.expectEqualStrings("03 RESOURCES", resources.getName());
 
-    // 04 Arquive
-    const arquive = ParaDirectory{
-        .name = .Arquive,
+    // 04 Archive
+    const archive = ParaDirectory{
+        .name = .Archive,
         .readme_content = "",
     };
-    try testing.expectEqualStrings("04 ARQUIVE", arquive.getName());
+    try testing.expectEqualStrings("04 ARCHIVE", archive.getName());
 }
