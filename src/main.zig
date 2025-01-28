@@ -87,14 +87,12 @@ pub fn main() !void {
         // Check for last directory. 
         if (i == para_directories.len - 1) {
             // If its the last one, the file tree ends.
-            std.debug.print(" ", .{});
+            std.debug.print("    ┖╴ReadMe.md generated!\n", .{});
         } else {
             // If its not the last one, the tree continues.
-            std.debug.print("┃", .{});
+            std.debug.print("┃   ┖╴ReadMe.md generated!\n", .{});
+            std.debug.print("┃   \n", .{});
         }
-
-        // Prints the ReadMe file on the file tree.
-        std.debug.print("    ┖╴ReadMe.md generated!\n", .{});
     }
 
     // Program (probably) completed successfully! 󱁖
