@@ -1,6 +1,7 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 
+/// Stores notes and files for active, time-bound tasks or deliverables.
 const dir_projects = ParaDirectory{
     //
     .name = .Projects,
@@ -10,6 +11,7 @@ const dir_projects = ParaDirectory{
     \\Stores notes and files for active, time-bound tasks or deliverables.
 };
 
+/// Contains ongoing responsibilities or areas of interest.
 const dir_areas = ParaDirectory{
     //
     .name = .Areas,
@@ -19,6 +21,7 @@ const dir_areas = ParaDirectory{
     \\Contains ongoing responsibilities or areas of interest.
 };
 
+/// Holds general reference materials and reusable templates.
 const dir_resources = ParaDirectory{
     //
     .name = .Resources,
@@ -28,6 +31,7 @@ const dir_resources = ParaDirectory{
     \\Holds general reference materials and reusable templates.
 };
 
+/// Keeps inactive projects and outdated resources for future reference.
 const dir_arquive = ParaDirectory{
     //
     .name = .Arquive,
@@ -37,18 +41,18 @@ const dir_arquive = ParaDirectory{
     \\Keeps inactive projects and outdated resources for future reference.
 };
 
+/// Storing all necessary directories for iteration.
+const para_directories = [4]ParaDirectory{
+    dir_projects, //    01 Projects/
+    dir_areas, //       02 Areas/
+    dir_resources, //   03 Resources/
+    dir_arquive, //     04 Arquive/
+};
+
+/// This is the entry point of the program.
 pub fn main() !void {
     // Getting current working directory.
     const cwd = std.fs.cwd();
-
-    // Storing all necessary directories for iteration.
-    const para_directories = [4]ParaDirectory{
-        //
-        dir_projects, //    01 Projects
-        dir_areas, //       02 Areas
-        dir_resources, //   03 Resources
-        dir_arquive, //     04 Arquive
-    };
 
     // Just adding a line feed, nothing fancy.
     std.debug.print("\n", .{});
@@ -67,7 +71,7 @@ pub fn main() !void {
             3 => std.debug.print("┖╴", .{}),
         }
 
-        std.debug.print("{s} directory created.\n", .{dir.getName()});
+        std.debug.print("{s} Directory created.\n", .{dir.getName()});
 
         // Open it. 
         var sub_dir = try cwd.openDir(dir.getName(), .{});
@@ -89,8 +93,10 @@ pub fn main() !void {
             std.debug.print("┃", .{});
         }
 
+        // Prints the ReadMe file on the file tree.
         std.debug.print("    ┖╴ReadMe.md generated!\n", .{});
     }
 
+    // Program (probably) completed successfully! 󱁖
     std.debug.print("\n▒ All done! ▒\n\n", .{});
 }
