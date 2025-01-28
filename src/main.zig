@@ -1,7 +1,7 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 
-const projects = ParaDirectory{
+const dir_projects = ParaDirectory{
     //
     .name = .Projects,
     .readme_content =
@@ -10,7 +10,7 @@ const projects = ParaDirectory{
     \\Stores notes and files for active, time-bound tasks or deliverables.
 };
 
-const areas = ParaDirectory{
+const dir_areas = ParaDirectory{
     //
     .name = .Areas,
     .readme_content =
@@ -19,7 +19,7 @@ const areas = ParaDirectory{
     \\Contains ongoing responsibilities or areas of interest.
 };
 
-const resources = ParaDirectory{
+const dir_resources = ParaDirectory{
     //
     .name = .Resources,
     .readme_content =
@@ -28,7 +28,7 @@ const resources = ParaDirectory{
     \\Holds general reference materials and reusable templates.
 };
 
-const arquive = ParaDirectory{
+const dir_arquive = ParaDirectory{
     //
     .name = .Arquive,
     .readme_content =
@@ -38,27 +38,52 @@ const arquive = ParaDirectory{
 };
 
 pub fn main() !void {
+    // Getting current working directory.
     const cwd = std.fs.cwd();
-    const directories = [4]ParaDirectory{
+
+    // Storing all necessary directories for iteration.
+    const para_directories = [4]ParaDirectory{
         //
-        projects,
-        areas,
-        resources,
-        arquive,
+        dir_projects, //    01 Projects
+        dir_areas, //       02 Areas
+        dir_resources, //   03 Resources
+        dir_arquive, //     04 Arquive
     };
 
-    for (directories) |dir| {
+    // For every item on the para_directories array,
+    // generate the respective directory, and write content to is
+    // ReadME file.
+    for (para_directories, 0..) |dir, i| {
+        // Generate directory 
         try cwd.makeDir(dir.getName());
 
+        // Drawing the file tree.
+        switch (i) {
+            0 => std.debug.print("┌╴", .{}),
+            else => std.debug.print("├╴", .{}),
+            3 => std.debug.print("└╴", .{}),
+        }
+
+        std.debug.print("{s} directory created. \n", .{dir.getName()});
+
+        // Open it. 
         var sub_dir = try cwd.openDir(dir.getName(), .{});
         defer sub_dir.close();
 
-        const file = try sub_dir.createFile("README.md", .{});
+        // Generate a ReadME.md file. 
+        const file = try sub_dir.createFile("ReadME.md", .{});
         defer file.close();
 
+        // Write content to it. 
         _ = try file.write(dir.readme_content);
-        std.debug.print("{s} generated! \n", .{dir.getName()});
+
+        // Check for last directory.
+        if (i == 3) {
+            std.debug.print("     └╴ReadMe.md generated.\n", .{});
+        } else {
+            std.debug.print("│    └╴ReadMe.md generated.\n", .{});
+        }
     }
 
-    std.debug.print("\nAll done! You are ready to use your PARA method.\n", .{});
+    std.debug.print("\n> All done!\n", .{});
 }
