@@ -59,12 +59,12 @@ pub fn main() !void {
 
         // Drawing the file tree.
         switch (i) {
-            0 => std.debug.print("┌╴", .{}),
-            else => std.debug.print("├╴", .{}),
-            3 => std.debug.print("└╴", .{}),
+            0 => std.debug.print("┎╴", .{}),
+            else => std.debug.print("┠╴", .{}),
+            3 => std.debug.print("┖╴", .{}),
         }
 
-        std.debug.print("{s} directory created. \n", .{dir.getName()});
+        std.debug.print("{s} directory created.\n", .{dir.getName()});
 
         // Open it. 
         var sub_dir = try cwd.openDir(dir.getName(), .{});
@@ -77,13 +77,17 @@ pub fn main() !void {
         // Write content to it. 
         _ = try file.write(dir.readme_content);
 
-        // Check for last directory.
+        // Check for last directory. 
         if (i == 3) {
-            std.debug.print("     └╴ReadMe.md generated.\n", .{});
+            // If its the last one, the file tree ends.
+            std.debug.print(" ", .{});
         } else {
-            std.debug.print("│    └╴ReadMe.md generated.\n", .{});
+            // If its not the last one, the tree continues.
+            std.debug.print("┃", .{});
         }
+
+        std.debug.print("    └╴ReadMe.md generated!\n", .{});
     }
 
-    std.debug.print("\n> All done!\n", .{});
+    std.debug.print("\n▒ All done! ▒\n", .{});
 }
