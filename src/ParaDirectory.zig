@@ -12,16 +12,17 @@ pub const ParaDirectory = struct {
     /// Content to be written to the README.md file inside every PARA directory.
     readme_content: []const u8,
 
-    /// A constant reference to itself.
+    /// Allows the struct to reference  itself.
     const self = @This();
 
-    // Returns a string containing the number and name of the directory.
+    /// Returns a string containing the number and name of the directory.
+    /// Useful for writing paths when generating diretories.
     pub fn getName(s: self) []const u8 {
         return switch (s.name) {
-            .Projects => "01 PROJECTS",
-            .Areas => "02 AREAS",
-            .Resources => "03 RESOURCES",
-            .Archive => "04 ARCHIVE",
+            .Projects => "01 PROJECTS", //       01 Projects/
+            .Areas => "02 AREAS", //             02 Areas/
+            .Resources => "03 RESOURCES", //     03 Resources/
+            .Archive => "04 ARCHIVE", //         04 Archive/
         };
     }
 };

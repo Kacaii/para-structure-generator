@@ -53,9 +53,8 @@ pub fn main() !void {
     // Just adding a line feed, nothing fancy.
     std.debug.print("\n", .{});
 
-    // For every item on the para_directories array,
-    // generate the respective directory, and write content to is
-    // ReadME file.
+    // For every item on the para_directories array, generate the respective directory,
+    // and write content to its  ReadME.md file.
     for (para_directories, 0..) |dir, i| {
         // Generate directory 
         try generateParaDirectory(&cwd, dir);
@@ -70,6 +69,7 @@ pub fn main() !void {
         // Feedback for the user.
         std.debug.print("{s} Directory created.\n", .{dir.getName()});
 
+        // Creates and Write contents to README.md file.
         try writeContentToReadME(&cwd, dir);
 
         // Check for last directory. 
@@ -83,10 +83,11 @@ pub fn main() !void {
         }
     }
 
-    // Program (probably) completed successfully! 󱁖
+    // Program ( hopefully 󱜙 ) completed successfully! 󱁖
     std.debug.print("\n▒ All done! ▒\n\n", .{});
 }
 
+/// Takes a Directory and generates the respective ParaDirectory passed as argument.
 fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
     dir.makeDir(para_directory.getName()) catch |err| switch (err) {
         error.PathAlreadyExists => {
@@ -98,6 +99,7 @@ fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs
     };
 }
 
+/// Creates an README and writes content to it.
 fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     var sub_dir = dir.openDir(para_directory.getName(), .{}) catch |err| switch (err) {
         error.FileNotFound => {
@@ -112,12 +114,8 @@ fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
 
     // Generate a ReadME.md file. 
     const file = sub_dir.createFile("README.md", .{}) catch |err| switch (err) {
-        error.FileNotFound => {
-            std.log.err("README file not found inside ParaDirectory.\n", .{});
-            std.process.exit(1); // Finishing the program.
-        },
         error.PathAlreadyExists => {
-            std.log.err("There is already a README File in the PARA Directory.\n", .{});
+            std.log.err("There is already a \"README.md\" File in the PARA Directory.\n", .{});
             std.process.exit(1); // Finishing the program.
         },
 
