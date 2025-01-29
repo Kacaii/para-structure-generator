@@ -2,8 +2,7 @@ const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 
 /// Stores notes and files for active, time-bound tasks or deliverables.
-const dir_projects = ParaDirectory{
-    //
+const dir_projects = ParaDirectory{ //
     .name = .Projects,
     .readme_content =
     \\# 01 PROJECTS
@@ -12,8 +11,7 @@ const dir_projects = ParaDirectory{
 };
 
 /// Contains ongoing responsibilities or areas of interest.
-const dir_areas = ParaDirectory{
-    //
+const dir_areas = ParaDirectory{ //
     .name = .Areas,
     .readme_content =
     \\# 02 AREAS
@@ -22,8 +20,7 @@ const dir_areas = ParaDirectory{
 };
 
 /// Holds general reference materials and reusable templates.
-const dir_resources = ParaDirectory{
-    //
+const dir_resources = ParaDirectory{ //
     .name = .Resources,
     .readme_content =
     \\# 03 RESOURCES
@@ -32,8 +29,7 @@ const dir_resources = ParaDirectory{
 };
 
 /// Keeps inactive projects and outdated resources for future reference.
-const dir_archive = ParaDirectory{
-    //
+const dir_archive = ParaDirectory{ //
     .name = .Archive,
     .readme_content =
     \\# 04 ARCHIVE
@@ -42,7 +38,7 @@ const dir_archive = ParaDirectory{
 };
 
 /// Storing all necessary directories for iteration.
-const para_directories = [4]ParaDirectory{
+const para_directories = [4]ParaDirectory{ //
     dir_projects, //    01 Projects/
     dir_areas, //       02 Areas/
     dir_resources, //   03 Resources/
