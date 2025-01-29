@@ -56,9 +56,16 @@ pub fn main() !void {
     // For every item on the para_directories array,
     // generate the respective directory, and write content to is
     // ReadME file.
+
     for (para_directories, 0..) |dir, i| {
         // Generate directory 
-        try cwd.makeDir(dir.getName());
+        cwd.makeDir(dir.getName()) catch |err| switch (err) {
+            error.PathAlreadyExists => {
+                std.debug.print("Directory already exists!\n\n", .{});
+                std.process.exit(1);
+            },
+            else => return err,
+        };
 
         // Drawing the file tree.
         switch (i) {
