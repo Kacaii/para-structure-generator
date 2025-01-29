@@ -90,7 +90,7 @@ pub fn main() !void {
 fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
     dir.makeDir(para_directory.getName()) catch |err| switch (err) {
         error.PathAlreadyExists => {
-            std.log.err("A PARA Structure already exists on the current directory. \n\n", .{});
+            std.log.err("A PARA Structure already exists on the current directory.\n", .{});
             std.process.exit(1); // Finishing the program.
         },
 
