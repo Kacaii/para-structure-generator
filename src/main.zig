@@ -48,7 +48,7 @@ const para_directories = [4]ParaDirectory{
 /// This is the entry point of the program.
 pub fn main() !void {
     // Getting current working directory.
-    const cwd = std.fs.cwd();
+    var cwd = std.fs.cwd();
 
     // Just adding a line feed, nothing fancy.
     std.debug.print("\n", .{});
@@ -56,17 +56,9 @@ pub fn main() !void {
     // For every item on the para_directories array,
     // generate the respective directory, and write content to is
     // ReadME file.
-
     for (para_directories, 0..) |dir, i| {
         // Generate directory 
-        cwd.makeDir(dir.getName()) catch |err| switch (err) {
-            error.PathAlreadyExists => {
-                std.debug.print("PARA Directories already exists on the current directory! \n\n", .{});
-                std.process.exit(1); // Finishing the program.
-            },
-
-            else => return err,
-        };
+        try generateParaDirectory(&cwd, dir);
 
         // Drawing the file tree.
         switch (i) {
@@ -75,18 +67,10 @@ pub fn main() !void {
             3 => std.debug.print("┖╴", .{}), //      ┖╴ Last Directory/
         }
 
+        // Feedback for the user.
         std.debug.print("{s} Directory created.\n", .{dir.getName()});
 
-        // Open it. 
-        var sub_dir = try cwd.openDir(dir.getName(), .{});
-        defer sub_dir.close();
-
-        // Generate a ReadME.md file. 
-        const file = try sub_dir.createFile("README.md", .{});
-        defer file.close();
-
-        // Write content to it. 
-        _ = try file.write(dir.readme_content);
+        try writeContentToReadME(&cwd, dir);
 
         // Check for last directory. 
         if (i == para_directories.len - 1) {
@@ -101,4 +85,47 @@ pub fn main() !void {
 
     // Program (probably) completed successfully! 󱁖
     std.debug.print("\n▒ All done! ▒\n\n", .{});
+}
+
+fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
+    dir.makeDir(para_directory.getName()) catch |err| switch (err) {
+        error.PathAlreadyExists => {
+            std.log.err("A PARA Structure already exists on the current directory. \n\n", .{});
+            std.process.exit(1); // Finishing the program.
+        },
+
+        else => return err,
+    };
+}
+
+fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
+    var sub_dir = dir.openDir(para_directory.getName(), .{}) catch |err| switch (err) {
+        error.FileNotFound => {
+            std.log.err("Failed to Open README.md file.\n", .{});
+            std.process.exit(1); // Finishing the program.
+        },
+
+        else => return err,
+    };
+
+    defer sub_dir.close();
+
+    // Generate a ReadME.md file. 
+    const file = sub_dir.createFile("README.md", .{}) catch |err| switch (err) {
+        error.FileNotFound => {
+            std.log.err("README file not found inside ParaDirectory.\n", .{});
+            std.process.exit(1); // Finishing the program.
+        },
+        error.PathAlreadyExists => {
+            std.log.err("There is already a README File in the PARA Directory.\n", .{});
+            std.process.exit(1); // Finishing the program.
+        },
+
+        else => return err,
+    };
+
+    defer file.close();
+
+    // Write content to it. 
+    _ = try file.write(para_directory.readme_content);
 }
