@@ -38,7 +38,7 @@ const dir_archive = ParaDirectory{ //
 };
 
 /// Storing all necessary directories for iteration.
-const para_directories = [4]ParaDirectory{ //
+const para_directories = [4]ParaDirectory{
     dir_projects, //    01 Projects/
     dir_areas, //       02 Areas/
     dir_resources, //   03 Resources/
@@ -61,17 +61,18 @@ pub fn main() !void {
         // Generate directory 
         cwd.makeDir(dir.getName()) catch |err| switch (err) {
             error.PathAlreadyExists => {
-                std.debug.print("Directory already exists!\n\n", .{});
-                std.process.exit(1);
+                std.debug.print("PARA Directories already exists on the current directory! \n\n", .{});
+                std.process.exit(1); // Finishing the program.
             },
+
             else => return err,
         };
 
         // Drawing the file tree.
         switch (i) {
-            0 => std.debug.print("┎╴", .{}),
-            else => std.debug.print("┠╴", .{}),
-            3 => std.debug.print("┖╴", .{}),
+            0 => std.debug.print("┎╴", .{}), //      ┎╴ First Directory/
+            else => std.debug.print("┠╴", .{}), //   ┠╴ Middle Directories/
+            3 => std.debug.print("┖╴", .{}), //      ┖╴ Last Directory/
         }
 
         std.debug.print("{s} Directory created.\n", .{dir.getName()});
@@ -81,7 +82,7 @@ pub fn main() !void {
         defer sub_dir.close();
 
         // Generate a ReadME.md file. 
-        const file = try sub_dir.createFile("ReadME.md", .{});
+        const file = try sub_dir.createFile("README.md", .{});
         defer file.close();
 
         // Write content to it. 
@@ -90,10 +91,10 @@ pub fn main() !void {
         // Check for last directory. 
         if (i == para_directories.len - 1) {
             // If its the last one, the file tree ends.
-            std.debug.print("    ┖╴ReadMe.md generated!\n", .{});
+            std.debug.print("    ┖╴README.md generated!\n", .{});
         } else {
             // If its not the last one, the tree continues.
-            std.debug.print("┃   ┖╴ReadMe.md generated!\n", .{});
+            std.debug.print("┃   ┖╴README.md generated!\n", .{});
             std.debug.print("┃   \n", .{});
         }
     }
