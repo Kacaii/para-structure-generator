@@ -91,6 +91,7 @@ pub fn main() !void {
 fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
     dir.makeDir(para_directory.getName()) catch |err| switch (err) {
         error.PathAlreadyExists => {
+            // Add error handling for this case since its a more common one.
             std.log.err("The directory already exists: {s}\n", .{para_directory.getName()});
             std.process.exit(1); // Finishing the program.
         },
