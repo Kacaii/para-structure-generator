@@ -62,7 +62,7 @@ pub fn main() !void {
         // Generate directory 
         try generateParaDirectory(&cwd, dir);
 
-        // Drawing the file tree.
+        // Printing the file tree.
         switch (i) {
             0 => std.debug.print("┎╴", .{}), //      ┎╴ First Directory/
             else => std.debug.print("┠╴", .{}), //   ┠╴ Middle Directories/
@@ -90,8 +90,9 @@ pub fn main() !void {
     std.debug.print("\n▒ All done! ▒\n\n", .{});
 }
 
-/// Takes a Directory and generates the respective ParaDirectory passed as argument.
+/// Takes an directory and creates a new one using the provided ParaDirectory.
 fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
+    // Generating a sub_path inside the directory provided.
     dir.makeDir(para_directory.getName()) catch |err| switch (err) {
         error.PathAlreadyExists => {
             // Add error handling for this case since its a more common one.
