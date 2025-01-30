@@ -101,29 +101,13 @@ fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs
 
 /// Creates an README and writes content to it.
 fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
-    var sub_dir = dir.openDir(para_directory.getName(), .{}) catch |err| switch (err) {
-        error.FileNotFound => {
-            std.log.err("Failed to open the directory: {s}\n", .{para_directory.getName()});
-            std.process.exit(1); // Finishing the program.
-        },
-
-        else => return err,
-    };
-
+    var sub_dir = try dir.openDir(para_directory.getName(), .{});
     defer sub_dir.close();
 
     // Generate a ReadME.md file. 
-    const file = sub_dir.createFile("README.md", .{}) catch |err| switch (err) {
-        error.PathAlreadyExists => {
-            std.log.err("There is already a \"README.md\" File in the directory: {s}\n", .{para_directory.getName()});
-            std.process.exit(1); // Finishing the program.
-        },
-
-        else => return err,
-    };
-
-    defer file.close();
+    const readme_file = try sub_dir.createFile("README.md", .{});
+    defer readme_file.close();
 
     // Write content to it. 
-    _ = try file.write(para_directory.readme_content);
+    _ = try readme_file.write(para_directory.readme_content);
 }
