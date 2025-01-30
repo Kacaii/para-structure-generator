@@ -1,6 +1,9 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 
+// Storing string in a constant for reusability.
+const README_FILE = "README.md";
+
 /// Stores notes and files for active, time-bound tasks or deliverables.
 const dir_projects = ParaDirectory{ //
     .name = .Projects,
@@ -75,10 +78,10 @@ pub fn main() !void {
         // Check for last directory. 
         if (i == para_directories.len - 1) {
             // If its the last one, the file tree ends.
-            std.debug.print("    ┖╴README.md generated!\n", .{});
+            std.debug.print("    ┖╴{s} generated!\n", .{README_FILE});
         } else {
             // If its not the last one, the tree continues.
-            std.debug.print("┃   ┖╴README.md generated!\n", .{});
+            std.debug.print("┃   ┖╴{s} generated!\n", .{README_FILE});
             std.debug.print("┃   \n", .{});
         }
     }
@@ -106,7 +109,7 @@ fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     defer sub_dir.close();
 
     // Generate a ReadME.md file. 
-    const readme_file = try sub_dir.createFile("README.md", .{});
+    const readme_file = try sub_dir.createFile(README_FILE, .{});
     defer readme_file.close();
 
     // Write content to it. 
