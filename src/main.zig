@@ -91,7 +91,7 @@ pub fn main() !void {
 fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
     dir.makeDir(para_directory.getName()) catch |err| switch (err) {
         error.PathAlreadyExists => {
-            std.log.err("A PARA Structure already exists on the current directory.\n", .{});
+            std.log.err("The directory already exists: {s}\n", .{para_directory.getName()});
             std.process.exit(1); // Finishing the program.
         },
 
@@ -103,7 +103,7 @@ fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs
 fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     var sub_dir = dir.openDir(para_directory.getName(), .{}) catch |err| switch (err) {
         error.FileNotFound => {
-            std.log.err("Failed to Open README.md file.\n", .{});
+            std.log.err("Failed to open the directory: {s}\n", .{para_directory.getName()});
             std.process.exit(1); // Finishing the program.
         },
 
@@ -115,7 +115,7 @@ fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     // Generate a ReadME.md file. 
     const file = sub_dir.createFile("README.md", .{}) catch |err| switch (err) {
         error.PathAlreadyExists => {
-            std.log.err("There is already a \"README.md\" File in the PARA Directory.\n", .{});
+            std.log.err("There is already a \"README.md\" File in the directory: {s}\n", .{para_directory.getName()});
             std.process.exit(1); // Finishing the program.
         },
 
