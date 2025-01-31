@@ -40,9 +40,8 @@ const para_directories = [4]ParaMethod{
     dir_archive, //     04 Archive/
 };
 
-/// This is the entry point of the program.
 pub fn main() !void {
-    // Getting current working directory.
+    // Open current directory.
     var cwd = std.fs.cwd();
 
     // Just adding a line feed, nothing fancy.
@@ -51,58 +50,48 @@ pub fn main() !void {
     // For every item on the para_directories array, generate the respective directory,
     // and write content to its  ReadME.md file.
     for (para_directories, 0..) |dir, i| {
-        // Generate directory 
-        try generateParaDirectory(&cwd, dir);
 
-        // Printing the file tree.
+        // Creating a sub_path inside the directory provided.
+        cwd.makeDir(dir.toString()) catch |err| switch (err) {
+            error.PathAlreadyExists => {
+                std.log.err("The directory already exists: {s}\n", .{dir.toString()});
+                return;
+            },
+            else => return err,
+        };
+
+        // Providing feedback for the user.
         switch (i) {
-            0 => std.debug.print("┎╴", .{}), //      ┎╴ First Directory/
-            else => std.debug.print("┠╴", .{}), //   ┠╴ Middle Directories/
-            3 => std.debug.print("┖╴", .{}), //      ┖╴ Last Directory/
+            0 => std.debug.print("┎╴", .{}), //      ┎╴
+            else => std.debug.print("┠╴", .{}), //   ┠╴ 
+            3 => std.debug.print("┖╴", .{}), //      ┖╴
         }
-
-        // Feedback for the user.
         std.debug.print("{s} Directory created.\n", .{dir.toString()});
 
-        // Creates and Write contents to README.md file.
-        try writeContentToReadME(&cwd, dir);
+        // Accessing the generated directory.
+        var sub_dir = try cwd.openDir(dir.toString(), .{});
+        defer sub_dir.close();
 
-        // Check for last directory. 
-        if (i == para_directories.len - 1) {
-            // If its the last one, the file tree ends.
-            std.debug.print("    ┖╴{s} generated!\n", .{README_FILE});
-        } else {
-            // If its not the last one, the tree continues.
+        // Creates and Write contents to README.md file.
+        try writeContentToReadME(&sub_dir, dir);
+
+        // Verifies if its in the last iteration.
+        if (i != para_directories.len - 1) {
             std.debug.print("┃   ┖╴{s} generated!\n", .{README_FILE});
             std.debug.print("┃   \n", .{});
+        } else {
+            std.debug.print("    ┖╴{s} generated!\n", .{README_FILE});
         }
     }
 
-    // Program ( hopefully 󱜙 ) completed successfully! 󱁖
+    // Script ( hopefully 󱜙 ) completed successfully! 󱁖
     std.debug.print("\n▒ All done! ▒\n\n", .{});
-}
-
-/// Takes an directory and creates a new one using the provided ParaDirectory.
-fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaMethod) std.fs.Dir.MakeError!void {
-    // Generating a sub_path inside the directory provided.
-    dir.makeDir(para_directory.toString()) catch |err| switch (err) {
-        error.PathAlreadyExists => {
-            // Add error handling for this case since its a more common one.
-            std.log.err("The directory already exists: {s}\n", .{para_directory.toString()});
-            std.process.exit(1); // Finishing the program.
-        },
-
-        else => return err,
-    };
 }
 
 /// Creates an README and writes content to it.
 fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
-    var sub_dir = try dir.openDir(para_directory.toString(), .{});
-    defer sub_dir.close();
-
     // Generate a ReadME.md file. 
-    const readme_file = try sub_dir.createFile(README_FILE, .{});
+    const readme_file = try dir.createFile(README_FILE, .{});
     defer readme_file.close();
 
     // Write content to it. 

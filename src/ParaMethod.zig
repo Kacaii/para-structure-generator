@@ -8,12 +8,18 @@ const testing = std.testing;
 /// for structuring PARA Method's Directories.
 pub const ParaMethod = struct {
     const Self = @This();
-    const Directory = union(enum) { Projects, Areas, Resources, Archive };
 
-    name: Directory,
+    const ParaDirectory = union(enum) {
+        Projects,
+        Areas,
+        Resources,
+        Archive,
+    };
+
+    name: ParaDirectory,
     readme_content: []const u8,
 
-    pub fn init(name: ParaMethod.Directory, readme_content: []const u8) Self {
+    pub fn init(name: Self.ParaDirectory, readme_content: []const u8) Self {
         return .{
             .name = name, //
             .readme_content = readme_content, //
@@ -31,7 +37,7 @@ pub const ParaMethod = struct {
     }
 };
 
-test "getName" {
+test "toString" {
     // 01 Projects
     const projects = ParaMethod.init(.Projects, "");
     try testing.expectEqualStrings("01 PROJECTS", projects.toString());
