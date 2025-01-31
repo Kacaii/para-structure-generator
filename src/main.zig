@@ -1,47 +1,39 @@
 const std = @import("std");
-const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
+const ParaMethod = @import("ParaMethod.zig").ParaMethod;
 
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
 
 /// Stores notes and files for active, time-bound tasks or deliverables.
-const dir_projects = ParaDirectory{ //
-    .name = .Projects,
-    .readme_content =
+const dir_projects = ParaMethod.init(.Projects,
     \\# 01 PROJECTS
     \\
     \\Stores notes and files for active, time-bound tasks or deliverables.
-};
+);
 
 /// Contains ongoing responsibilities or areas of interest.
-const dir_areas = ParaDirectory{ //
-    .name = .Areas,
-    .readme_content =
+const dir_areas = ParaMethod.init(.Areas,
     \\# 02 AREAS
     \\
     \\Contains ongoing responsibilities or areas of interest.
-};
+);
 
 /// Holds general reference materials and reusable templates.
-const dir_resources = ParaDirectory{ //
-    .name = .Resources,
-    .readme_content =
+const dir_resources = ParaMethod.init(.Resources,
     \\# 03 RESOURCES
     \\
     \\Holds general reference materials and reusable templates.
-};
+);
 
 /// Keeps inactive projects and outdated resources for future reference.
-const dir_archive = ParaDirectory{ //
-    .name = .Archive,
-    .readme_content =
+const dir_archive = ParaMethod.init(.Archive,
     \\# 04 ARCHIVE
     \\
     \\Keeps inactive projects and outdated resources for future reference.
-};
+);
 
 /// Storing all necessary directories for iteration.
-const para_directories = [4]ParaDirectory{
+const para_directories = [4]ParaMethod{
     dir_projects, //    01 Projects/
     dir_areas, //       02 Areas/
     dir_resources, //   03 Resources/
@@ -70,7 +62,7 @@ pub fn main() !void {
         }
 
         // Feedback for the user.
-        std.debug.print("{s} Directory created.\n", .{dir.getName()});
+        std.debug.print("{s} Directory created.\n", .{dir.toString()});
 
         // Creates and Write contents to README.md file.
         try writeContentToReadME(&cwd, dir);
@@ -91,12 +83,12 @@ pub fn main() !void {
 }
 
 /// Takes an directory and creates a new one using the provided ParaDirectory.
-fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs.Dir.MakeError!void {
+fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaMethod) std.fs.Dir.MakeError!void {
     // Generating a sub_path inside the directory provided.
-    dir.makeDir(para_directory.getName()) catch |err| switch (err) {
+    dir.makeDir(para_directory.toString()) catch |err| switch (err) {
         error.PathAlreadyExists => {
             // Add error handling for this case since its a more common one.
-            std.log.err("The directory already exists: {s}\n", .{para_directory.getName()});
+            std.log.err("The directory already exists: {s}\n", .{para_directory.toString()});
             std.process.exit(1); // Finishing the program.
         },
 
@@ -105,8 +97,8 @@ fn generateParaDirectory(dir: *std.fs.Dir, para_directory: ParaDirectory) std.fs
 }
 
 /// Creates an README and writes content to it.
-fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
-    var sub_dir = try dir.openDir(para_directory.getName(), .{});
+fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
+    var sub_dir = try dir.openDir(para_directory.toString(), .{});
     defer sub_dir.close();
 
     // Generate a ReadME.md file. 
