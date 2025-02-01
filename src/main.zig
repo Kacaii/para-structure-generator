@@ -48,29 +48,37 @@ const para_directories = [4]ParaMethod{
 };
 
 pub fn main() !void {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+
+    const allocator = gpa.allocator();
+
+    const args = std.process.argsAlloc(allocator) catch |err| {
+        std.debug.print("Alloc failed {?}\n", .{err});
+        return;
+    };
+    defer std.process.argsFree(allocator, args);
+
     // Open current directory.
     var cwd = std.fs.cwd();
-    var args_iterator = std.process.args();
-    _ = args_iterator.skip(); // Skip the binary 󰒭
 
-    const cmd_path_arg = args_iterator.next();
-
-    // Directory where the file tree will be generated.
-    const base_directory = if (cmd_path_arg) |sub_path| cwd.openDir(sub_path, .{}) catch |err| {
+    // Uses the provided path as base directory for generate the structure.
+    // Defaults to the current one.
+    const base_directory = if (args.len == 1) cwd else cwd.openDir(args[1], .{}) catch |err| {
 
         // Handling specific errors.
         switch (err) {
             error.NotDir => {
-                std.log.err("Provided Path needs to be a Directory.\n", .{});
+                std.log.err("Provided Path needs to be a Directory.", .{});
                 return;
             },
             error.FileNotFound => {
-                std.log.err("Provided Path does not exist.\n", .{});
+                std.log.err("Provided Path does not exist.", .{});
                 return;
             },
             else => return err, // Returning unexpected error.
         }
-    } else cwd; // Defaults to the current directory if no valid path is provided.
+    };
 
     // Get standard output for providing feedback to user.
     const std_out = std.io.getStdOut().writer();
