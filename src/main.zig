@@ -5,7 +5,7 @@ const ParaMethod = @import("ParaMethod.zig").ParaMethod;
 const README_FILE = "README.md";
 
 /// Stores ANSI escape codes for output styling.
-const ansi = struct {
+const AnsiEscape = struct {
     const reset = "\x1b[0m";
     const green = "\x1b[32m";
     const blue = "\x1b[94m";
@@ -50,6 +50,29 @@ const para_directories = [4]ParaMethod{
 pub fn main() !void {
     // Open current directory.
     var cwd = std.fs.cwd();
+    var args_iterator = std.process.args();
+    _ = args_iterator.skip(); // Skip the binary 󰒭
+
+    const cmd_path_arg = args_iterator.next();
+
+    // Directory where the file tree will be generated.
+    const base_directory = if (cmd_path_arg) |sub_path| cwd.openDir(sub_path, .{}) catch |err| {
+
+        // Handling specific errors.
+        switch (err) {
+            error.NotDir => {
+                std.log.err("Provided Path needs to be a Directory.\n", .{});
+                return;
+            },
+            error.FileNotFound => {
+                std.log.err("Provided Path does not exist.\n", .{});
+                return;
+            },
+            else => return err, // Returning unexpected error.
+        }
+    } else cwd; // Defaults to the current directory if no valid path is provided.
+
+    // Get standard output for providing feedback to user.
     const std_out = std.io.getStdOut().writer();
 
     // Just adding a line feed, nothing fancy.
@@ -60,7 +83,7 @@ pub fn main() !void {
     for (para_directories, 0..) |dir, i| {
 
         // Creating a sub_path inside the directory provided.
-        cwd.makeDir(dir.toString()) catch |err| switch (err) {
+        base_directory.makeDir(dir.toString()) catch |err| switch (err) {
             error.PathAlreadyExists => {
                 std.log.err("The directory already exists: {s}\n", .{dir.toString()});
                 return;
@@ -77,7 +100,7 @@ pub fn main() !void {
         try std_out.print("{s} Directory created.\n", .{dir.toString()});
 
         // Accessing the generated directory.
-        var sub_dir = try cwd.openDir(dir.toString(), .{});
+        var sub_dir = try base_directory.openDir(dir.toString(), .{});
         defer sub_dir.close();
 
         // Creates and Write contents to README.md file.
@@ -93,9 +116,9 @@ pub fn main() !void {
     }
 
     // Script ( hopefully 󱜙 ) completed successfully! 󱁖
-    try std_out.writeAll(ansi.green);
+    try std_out.writeAll(AnsiEscape.green);
     try std_out.writeAll("\n▒ All done! ▒\n\n");
-    try std_out.writeAll(ansi.reset);
+    try std_out.writeAll(AnsiEscape.reset);
 }
 
 /// Creates an README and writes content to it.
