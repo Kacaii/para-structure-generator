@@ -4,6 +4,13 @@ const ParaMethod = @import("ParaMethod.zig").ParaMethod;
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
 
+/// Stores ANSI escape codes for output styling.
+const ansi = struct {
+    const reset = "\x1b[0m";
+    const green = "\x1b[32m";
+    const blue = "\x1b[94m";
+};
+
 /// Stores notes and files for active, time-bound tasks or deliverables.
 const dir_projects = ParaMethod.init(.Projects,
     \\# 01 PROJECTS
@@ -78,15 +85,17 @@ pub fn main() !void {
 
         // Verifies if its in the last iteration.
         if (i != para_directories.len - 1) {
-            try std_out.print("┃   ┖╴{s} generated!\n", .{README_FILE});
-            try std_out.print("┃   \n", .{});
+            try std_out.print("┃  ┖╴{s} generated!\n", .{README_FILE});
+            try std_out.print("┃  \n", .{});
         } else {
-            try std_out.print("    ┖╴{s} generated!\n", .{README_FILE});
+            try std_out.print("   ┖╴{s} generated!\n", .{README_FILE});
         }
     }
 
     // Script ( hopefully 󱜙 ) completed successfully! 󱁖
+    try std_out.writeAll(ansi.green);
     try std_out.writeAll("\n▒ All done! ▒\n\n");
+    try std_out.writeAll(ansi.reset);
 }
 
 /// Creates an README and writes content to it.
