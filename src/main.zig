@@ -43,9 +43,10 @@ const para_directories = [4]ParaMethod{
 pub fn main() !void {
     // Open current directory.
     var cwd = std.fs.cwd();
+    const std_out = std.io.getStdOut().writer();
 
     // Just adding a line feed, nothing fancy.
-    std.debug.print("\n", .{});
+    try std_out.writeAll("\n");
 
     // For every item on the para_directories array, generate the respective directory,
     // and write content to its  ReadME.md file.
@@ -62,11 +63,11 @@ pub fn main() !void {
 
         // Providing feedback for the user.
         switch (i) {
-            0 => std.debug.print("┎╴", .{}), //      ┎╴
-            else => std.debug.print("┠╴", .{}), //   ┠╴ 
-            3 => std.debug.print("┖╴", .{}), //      ┖╴
+            0 => try std_out.writeAll("┎╴"), //      ┎╴
+            else => try std_out.writeAll("┠╴"), //   ┠╴ 
+            3 => try std_out.writeAll("┖╴"), //      ┖╴
         }
-        std.debug.print("{s} Directory created.\n", .{dir.toString()});
+        try std_out.print("{s} Directory created.\n", .{dir.toString()});
 
         // Accessing the generated directory.
         var sub_dir = try cwd.openDir(dir.toString(), .{});
@@ -77,15 +78,15 @@ pub fn main() !void {
 
         // Verifies if its in the last iteration.
         if (i != para_directories.len - 1) {
-            std.debug.print("┃   ┖╴{s} generated!\n", .{README_FILE});
-            std.debug.print("┃   \n", .{});
+            try std_out.print("┃   ┖╴{s} generated!\n", .{README_FILE});
+            try std_out.print("┃   \n", .{});
         } else {
-            std.debug.print("    ┖╴{s} generated!\n", .{README_FILE});
+            try std_out.print("    ┖╴{s} generated!\n", .{README_FILE});
         }
     }
 
     // Script ( hopefully 󱜙 ) completed successfully! 󱁖
-    std.debug.print("\n▒ All done! ▒\n\n", .{});
+    try std_out.writeAll("\n▒ All done! ▒\n\n");
 }
 
 /// Creates an README and writes content to it.
