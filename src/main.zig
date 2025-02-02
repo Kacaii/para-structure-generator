@@ -1,11 +1,6 @@
 const std = @import("std");
 const ParaMethod = @import("ParaMethod.zig").ParaMethod;
 
-const dir_projects = @import("ParaMethod.zig").dir_projects; //    01 Projects/
-const dir_areas = @import("ParaMethod.zig").dir_areas; //       02 Areas/
-const dir_resources = @import("ParaMethod.zig").dir_resources; //   03 Resources/
-const dir_archive = @import("ParaMethod.zig").dir_archive; //     04 Archive/
-
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
 
@@ -89,7 +84,7 @@ pub fn main() !void {
         defer sub_dir.close();
 
         // Creates and Write contents to README.md file.
-        try writeContentToReadME(&sub_dir, dir);
+        try writeReadME(&sub_dir, dir);
 
         // Verifies if its in the last iteration.
         if (i != para_directories.len - 1) {
@@ -107,7 +102,7 @@ pub fn main() !void {
 }
 
 /// Creates an README and writes content to it.
-fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
+fn writeReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
     // Generate a ReadME.md file. 
     const readme_file = try dir.createFile(README_FILE, .{});
     defer readme_file.close();
@@ -115,3 +110,31 @@ fn writeContentToReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
     // Write content to it. 
     _ = try readme_file.write(para_directory.readme_content);
 }
+
+/// Stores notes and files for active, time-bound tasks or deliverables.
+pub const dir_projects = ParaMethod.init(.Projects,
+    \\# 01 PROJECTS
+    \\
+    \\Stores notes and files for active, time-bound tasks or deliverables.
+);
+
+/// Contains ongoing responsibilities or areas of interest.
+pub const dir_areas = ParaMethod.init(.Areas,
+    \\# 02 AREAS
+    \\
+    \\Contains ongoing responsibilities or areas of interest.
+);
+
+/// Holds general reference materials and reusable templates.
+pub const dir_resources = ParaMethod.init(.Resources,
+    \\# 03 RESOURCES
+    \\
+    \\Holds general reference materials and reusable templates.
+);
+
+/// Keeps inactive projects and outdated resources for future reference.
+pub const dir_archive = ParaMethod.init(.Archive,
+    \\# 04 ARCHIVE
+    \\
+    \\Keeps inactive projects and outdated resources for future reference.
+);

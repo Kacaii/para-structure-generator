@@ -37,34 +37,6 @@ pub const ParaMethod = struct {
     }
 };
 
-/// Stores notes and files for active, time-bound tasks or deliverables.
-pub const dir_projects = ParaMethod.init(.Projects,
-    \\# 01 PROJECTS
-    \\
-    \\Stores notes and files for active, time-bound tasks or deliverables.
-);
-
-/// Contains ongoing responsibilities or areas of interest.
-pub const dir_areas = ParaMethod.init(.Areas,
-    \\# 02 AREAS
-    \\
-    \\Contains ongoing responsibilities or areas of interest.
-);
-
-/// Holds general reference materials and reusable templates.
-pub const dir_resources = ParaMethod.init(.Resources,
-    \\# 03 RESOURCES
-    \\
-    \\Holds general reference materials and reusable templates.
-);
-
-/// Keeps inactive projects and outdated resources for future reference.
-pub const dir_archive = ParaMethod.init(.Archive,
-    \\# 04 ARCHIVE
-    \\
-    \\Keeps inactive projects and outdated resources for future reference.
-);
-
 test "toString" {
     // 01 Projects
     const projects = ParaMethod.init(.Projects, "");
