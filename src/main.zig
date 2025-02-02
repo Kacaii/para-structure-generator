@@ -11,40 +11,12 @@ const AnsiEscape = struct {
     const blue = "\x1b[94m";
 };
 
-/// Stores notes and files for active, time-bound tasks or deliverables.
-const dir_projects = ParaMethod.init(.Projects,
-    \\# 01 PROJECTS
-    \\
-    \\Stores notes and files for active, time-bound tasks or deliverables.
-);
-
-/// Contains ongoing responsibilities or areas of interest.
-const dir_areas = ParaMethod.init(.Areas,
-    \\# 02 AREAS
-    \\
-    \\Contains ongoing responsibilities or areas of interest.
-);
-
-/// Holds general reference materials and reusable templates.
-const dir_resources = ParaMethod.init(.Resources,
-    \\# 03 RESOURCES
-    \\
-    \\Holds general reference materials and reusable templates.
-);
-
-/// Keeps inactive projects and outdated resources for future reference.
-const dir_archive = ParaMethod.init(.Archive,
-    \\# 04 ARCHIVE
-    \\
-    \\Keeps inactive projects and outdated resources for future reference.
-);
-
 /// Storing all necessary directories for iteration.
 const para_directories = [4]ParaMethod{
-    dir_projects, //    01 Projects/
-    dir_areas, //       02 Areas/
-    dir_resources, //   03 Resources/
-    dir_archive, //     04 Archive/
+    @import("ParaMethod.zig").dir_projects, //    01 Projects/
+    @import("ParaMethod.zig").dir_areas, //       02 Areas/
+    @import("ParaMethod.zig").dir_resources, //   03 Resources/
+    @import("ParaMethod.zig").dir_archive, //     04 Archive/
 };
 
 pub fn main() !void {
