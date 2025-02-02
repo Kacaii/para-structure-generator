@@ -1,6 +1,11 @@
 const std = @import("std");
 const ParaMethod = @import("ParaMethod.zig").ParaMethod;
 
+const dir_projects = @import("ParaMethod.zig").dir_projects; //    01 Projects/
+const dir_areas = @import("ParaMethod.zig").dir_areas; //       02 Areas/
+const dir_resources = @import("ParaMethod.zig").dir_resources; //   03 Resources/
+const dir_archive = @import("ParaMethod.zig").dir_archive; //     04 Archive/
+
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
 
@@ -13,10 +18,10 @@ const AnsiEscape = struct {
 
 /// Storing all necessary directories for iteration.
 const para_directories = [4]ParaMethod{
-    @import("ParaMethod.zig").dir_projects, //    01 Projects/
-    @import("ParaMethod.zig").dir_areas, //       02 Areas/
-    @import("ParaMethod.zig").dir_resources, //   03 Resources/
-    @import("ParaMethod.zig").dir_archive, //     04 Archive/
+    dir_projects, //    01 Projects/
+    dir_areas, //       02 Areas/
+    dir_resources, //   03 Resources/
+    dir_archive, //     04 Archive/
 };
 
 pub fn main() !void {
