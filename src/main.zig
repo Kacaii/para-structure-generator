@@ -1,5 +1,5 @@
 const std = @import("std");
-const ParaMethod = @import("ParaMethod.zig").ParaMethod;
+const ParaDirectory = @import("ParaMethod.zig").ParaDirectory;
 
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
@@ -11,7 +11,7 @@ const AnsiEscape = struct {
 };
 
 /// Storing all necessary directories for iteration.
-const para_directories = [4]ParaMethod{
+const para_directories = [4]ParaDirectory{
     dir_projects, //    01 Projects/
     dir_areas, //       02 Areas/
     dir_resources, //   03 Resources/
@@ -20,10 +20,11 @@ const para_directories = [4]ParaMethod{
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
+    defer _ = gpa.deinit(); // Freeing resources and detecting leaks.
 
     const allocator = gpa.allocator();
 
+    // Storing command-line args in an array.
     const args = std.process.argsAlloc(allocator) catch |err| {
         std.debug.print("Alloc failed {?}\n", .{err});
         return;
@@ -105,7 +106,7 @@ pub fn main() !void {
 }
 
 /// Creates an README and writes content to it.
-fn writeReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
+fn writeReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     // Generate a ReadME.md file. 
     const readme_file = try dir.createFile(README_FILE, .{});
     defer readme_file.close();
@@ -115,28 +116,28 @@ fn writeReadME(dir: *std.fs.Dir, para_directory: ParaMethod) !void {
 }
 
 /// Stores notes and files for active, time-bound tasks or deliverables.
-pub const dir_projects = ParaMethod.init(.Projects,
+pub const dir_projects = ParaDirectory.init(.Projects,
     \\# 01 PROJECTS
     \\
     \\Stores notes and files for active, time-bound tasks or deliverables.
 );
 
 /// Contains ongoing responsibilities or areas of interest.
-pub const dir_areas = ParaMethod.init(.Areas,
+pub const dir_areas = ParaDirectory.init(.Areas,
     \\# 02 AREAS
     \\
     \\Contains ongoing responsibilities or areas of interest.
 );
 
 /// Holds general reference materials and reusable templates.
-pub const dir_resources = ParaMethod.init(.Resources,
+pub const dir_resources = ParaDirectory.init(.Resources,
     \\# 03 RESOURCES
     \\
     \\Holds general reference materials and reusable templates.
 );
 
 /// Keeps inactive projects and outdated resources for future reference.
-pub const dir_archive = ParaMethod.init(.Archive,
+pub const dir_archive = ParaDirectory.init(.Archive,
     \\# 04 ARCHIVE
     \\
     \\Keeps inactive projects and outdated resources for future reference.
