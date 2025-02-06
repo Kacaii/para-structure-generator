@@ -6,9 +6,8 @@ const README_FILE = "README.md";
 
 /// Stores ANSI escape codes for output styling.
 const AnsiEscape = struct {
-    const reset = "\x1b[0m";
-    const green = "\x1b[32m";
-    const blue = "\x1b[94m";
+    const RESET = "\x1b[0m";
+    const GREEN = "\x1b[32m";
 };
 
 /// Storing all necessary directories for iteration.
@@ -53,10 +52,10 @@ pub fn main() !void {
     };
 
     // Get standard output for providing feedback to user.
-    const std_out = std.io.getStdOut().writer();
+    const stdout = std.io.getStdOut().writer();
 
     // Just adding a line feed, nothing fancy.
-    try std_out.writeAll("\n");
+    try stdout.writeAll("\n");
 
     // For every item on the para_directories array, generate the respective directory,
     // and write content to its  ReadME.md file.
@@ -71,13 +70,17 @@ pub fn main() !void {
             else => return err,
         };
 
-        // Providing feedback for the user.
+        // Printing the file tree
         switch (i) {
-            0 => try std_out.writeAll("┎╴"), //      ┎╴
-            else => try std_out.writeAll("┠╴"), //   ┠╴ 
-            3 => try std_out.writeAll("┖╴"), //      ┖╴
+            // First directory
+            0 => try stdout.print("┎╴{s} Directory created.\n", .{dir.toString()}),
+
+            // Middle directories
+            else => try stdout.print("┠╴{s} Directory created.\n", .{dir.toString()}),
+
+            // Last directory
+            (para_directories.len - 1) => try stdout.print("┖╴{s} Directory created.\n", .{dir.toString()}),
         }
-        try std_out.print("{s} Directory created.\n", .{dir.toString()});
 
         // Accessing the generated directory.
         var sub_dir = try base_directory.openDir(dir.toString(), .{});
@@ -88,17 +91,17 @@ pub fn main() !void {
 
         // Verifies if its in the last iteration.
         if (i != para_directories.len - 1) {
-            try std_out.print("┃  ┖╴{s} generated!\n", .{README_FILE});
-            try std_out.print("┃  \n", .{});
+            try stdout.print("┃  ┖╴{s} generated!\n", .{README_FILE});
+            try stdout.print("┃  \n", .{});
         } else {
-            try std_out.print("   ┖╴{s} generated!\n", .{README_FILE});
+            try stdout.print("   ┖╴{s} generated!\n", .{README_FILE});
         }
     }
 
     // Script ( hopefully 󱜙 ) completed successfully! 󱁖
-    try std_out.writeAll(AnsiEscape.green);
-    try std_out.writeAll("\n▒ All done! ▒\n\n");
-    try std_out.writeAll(AnsiEscape.reset);
+    try stdout.writeAll(AnsiEscape.GREEN);
+    try stdout.writeAll("\n▒ All done! ▒\n\n");
+    try stdout.writeAll(AnsiEscape.RESET);
 }
 
 /// Creates an README and writes content to it.
