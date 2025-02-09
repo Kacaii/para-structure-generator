@@ -1,5 +1,5 @@
 const std = @import("std");
-const ParaDirectory = @import("ParaMethod.zig").ParaDirectory;
+const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 
 // Storing string in a constant for reusability.
 const README_FILE = "README.md";
@@ -61,11 +61,17 @@ pub fn main() !void {
     // For every item on the para_directories array, generate the respective directory,
     // and write content to its  ReadME.md file.
     for (para_directories, 0..) |dir, i| {
+        const dir_name_tag = switch (dir.name) {
+            .Projects => "01 PROJECTS", //       01 Projects/
+            .Areas => "02 AREAS", //             02 Areas/
+            .Resources => "03 RESOURCES", //     03 Resources/
+            .Archive => "04 ARCHIVE", //         04 Archive/
+        };
 
         // Creating a sub_path inside the directory provided.
-        base_directory.makeDir(dir.toString()) catch |err| switch (err) {
+        base_directory.makeDir(dir_name_tag) catch |err| switch (err) {
             error.PathAlreadyExists => {
-                std.log.err("The directory already exists: {s}\n", .{dir.toString()});
+                std.log.err("The directory already exists: {s}\n", .{dir_name_tag});
                 return;
             },
             else => return err,
@@ -74,17 +80,17 @@ pub fn main() !void {
         // Printing the file tree
         switch (i) {
             // First directory
-            0 => try stdout.print("┎╴{s} Directory created.\n", .{dir.toString()}),
+            0 => try stdout.print("┎╴{s} Directory created.\n", .{dir_name_tag}),
 
             // Middle directories
-            else => try stdout.print("┠╴{s} Directory created.\n", .{dir.toString()}),
+            else => try stdout.print("┠╴{s} Directory created.\n", .{dir_name_tag}),
 
             // Last directory
-            (para_directories.len - 1) => try stdout.print("┖╴{s} Directory created.\n", .{dir.toString()}),
+            (para_directories.len - 1) => try stdout.print("┖╴{s} Directory created.\n", .{dir_name_tag}),
         }
 
         // Accessing the generated directory.
-        var sub_dir = try base_directory.openDir(dir.toString(), .{});
+        var sub_dir = try base_directory.openDir(dir_name_tag, .{});
         defer sub_dir.close();
 
         // Creates and Write contents to README.md file.
