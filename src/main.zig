@@ -31,7 +31,8 @@ pub fn main() !void {
     };
     defer std.process.argsFree(allocator, args);
 
-    if (std.mem.eql(u8, args[1], "help")) {
+    // Handle printing help message
+    if (args.len > 1 and std.mem.eql(u8, args[1], "help")) {
         try stdout.writeAll(help_file);
         return;
     }
