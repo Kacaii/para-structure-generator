@@ -8,4 +8,3 @@ Example:
 
     $ generate-para
     $ generate-para ~/Documents/
-
