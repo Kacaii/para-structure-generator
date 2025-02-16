@@ -1,0 +1,11 @@
+Usage: generate-para [path]
+
+Commands:
+
+    help      Display this help message
+
+Example:
+
+    $ generate-para
+    $ generate-para ~/Documents/
+

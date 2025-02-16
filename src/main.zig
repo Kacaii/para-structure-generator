@@ -1,5 +1,6 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
+const help_file = @embedFile("help.txt");
 
 const README_FILE = "README.md";
 
@@ -7,6 +8,8 @@ const AnsiEscape = struct {
     const RESET = "\x1b[0m";
     const GREEN = "\x1b[32m";
 };
+
+const stdout = std.io.getStdOut().writer();
 
 /// Storing all necessary directories for iteration.
 const para_directories = [4]ParaDirectory{
@@ -28,6 +31,11 @@ pub fn main() !void {
     };
     defer std.process.argsFree(allocator, args);
 
+    if (std.mem.eql(u8, args[1], "help")) {
+        try stdout.writeAll(help_file);
+        return;
+    }
+
     var cwd = std.fs.cwd();
 
     // Uses the provided path as base directory for generate the structure.
@@ -44,8 +52,6 @@ pub fn main() !void {
         },
         else => return err, // Returning unexpected error.
     };
-
-    const stdout = std.io.getStdOut().writer();
 
     try stdout.writeAll("\n");
 
