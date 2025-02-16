@@ -1,10 +1,10 @@
 Usage: generate-para [path]
 
-Commands:
+▒▒▒ Commands:
 
     help      Display this help message
 
-Example:
+▒▒▒ Example:
 
-    $ generate-para
-    $ generate-para ~/Documents/
+    generate-para
+    generate-para ~/Documents/
