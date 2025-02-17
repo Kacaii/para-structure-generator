@@ -1,6 +1,6 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
-const help_file = @embedFile("help.txt");
+const help_file_template = @embedFile("help.txt");
 
 const README_FILE = "README.md";
 
@@ -20,17 +20,31 @@ const para_directories = [4]ParaDirectory{
 };
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.GeneralPurposeAllocator(.{ .safety = true }){};
     defer _ = gpa.deinit();
 
     const allocator = gpa.allocator();
 
-    // Replace {{green}}
-    const help_file_green_replaced = try std.mem.replaceOwned(u8, allocator, help_file, "{{green}}", AnsiEscape.GREEN);
-    defer allocator.free(help_file_green_replaced);
+    const parsed_help_file = blk: {
+        // Replace {{green}}
+        const help_file_green_replaced = try std.mem.replaceOwned(
+            u8,
+            allocator,
+            help_file_template,
+            "{{green}}",
+            AnsiEscape.GREEN,
+        );
+        defer allocator.free(help_file_green_replaced);
 
-    // Replace {{default_foreground}}
-    const parsed_help_file = try std.mem.replaceOwned(u8, allocator, help_file_green_replaced, "{{default_foreground}}", AnsiEscape.DEFAULT_FOREGROUND);
+        // Replace {{default_foreground}}
+        break :blk try std.mem.replaceOwned(
+            u8,
+            allocator,
+            help_file_green_replaced,
+            "{{default_foreground}}",
+            AnsiEscape.DEFAULT_FOREGROUND,
+        );
+    };
     defer allocator.free(parsed_help_file);
 
     const args = std.process.argsAlloc(allocator) catch |err| {
