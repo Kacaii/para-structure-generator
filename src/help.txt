@@ -1,10 +1,10 @@
 Usage: generate-para [path]
 
-▒▒▒ Commands:
+{{green}}▒▒▒ Commands:{{default_foreground}}
 
     help      Display this help message
 
-▒▒▒ Example:
+{{green}}▒▒▒ Example:{{default_foreground}}
 
     generate-para
     generate-para ~/Documents/

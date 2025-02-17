@@ -5,7 +5,7 @@ const help_file = @embedFile("help.txt");
 const README_FILE = "README.md";
 
 const AnsiEscape = struct {
-    const RESET = "\x1b[0m";
+    const DEFAULT_FOREGROUND = "\x1b[0m";
     const GREEN = "\x1b[32m";
 };
 
@@ -25,6 +25,14 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
+    // Replace {{green}}
+    const help_file_green_replaced = try std.mem.replaceOwned(u8, allocator, help_file, "{{green}}", AnsiEscape.GREEN);
+    defer allocator.free(help_file_green_replaced);
+
+    // Replace {{default_foreground}}
+    const parsed_help_file = try std.mem.replaceOwned(u8, allocator, help_file_green_replaced, "{{default_foreground}}", AnsiEscape.DEFAULT_FOREGROUND);
+    defer allocator.free(parsed_help_file);
+
     const args = std.process.argsAlloc(allocator) catch |err| {
         std.debug.print("Alloc failed {?}\n", .{err});
         return;
@@ -33,7 +41,7 @@ pub fn main() !void {
 
     // Handle printing help message
     if (args.len > 1 and std.mem.eql(u8, args[1], "help")) {
-        try stdout.writeAll(help_file);
+        try stdout.writeAll(parsed_help_file);
         return;
     }
 
@@ -106,7 +114,7 @@ pub fn main() !void {
     // Script ( hopefully 󱜙 ) completed successfully! 󱁖
     try stdout.writeAll(AnsiEscape.GREEN);
     try stdout.writeAll("\n▒ All done! ▒\n\n");
-    try stdout.writeAll(AnsiEscape.RESET);
+    try stdout.writeAll(AnsiEscape.DEFAULT_FOREGROUND);
 }
 
 /// Creates an README and writes content to it.
