@@ -1,8 +1,8 @@
 const std = @import("std");
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
-const help_file_template = @embedFile("help.txt");
+const HELP_FILE = @embedFile("help.txt");
 
-const README_FILE = "README.md";
+const README_FILE_NAME = "README.md";
 
 const AnsiEscape = struct {
     const DEFAULT_FOREGROUND = "\x1b[0m";
@@ -25,28 +25,6 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
-    const parsed_help_file = blk: {
-        // Replace {{green}}
-        const help_file_green_replaced = try std.mem.replaceOwned(
-            u8,
-            allocator,
-            help_file_template,
-            "{{green}}",
-            AnsiEscape.GREEN,
-        );
-        defer allocator.free(help_file_green_replaced);
-
-        // Replace {{default_foreground}}
-        break :blk try std.mem.replaceOwned(
-            u8,
-            allocator,
-            help_file_green_replaced,
-            "{{default_foreground}}",
-            AnsiEscape.DEFAULT_FOREGROUND,
-        );
-    };
-    defer allocator.free(parsed_help_file);
-
     const args = std.process.argsAlloc(allocator) catch |err| {
         std.debug.print("Alloc failed {?}\n", .{err});
         return;
@@ -55,7 +33,7 @@ pub fn main() !void {
 
     // Handle printing help message
     if (args.len > 1 and std.mem.eql(u8, args[1], "help")) {
-        try stdout.writeAll(parsed_help_file);
+        try stdout.writeAll(HELP_FILE);
         return;
     }
 
@@ -118,10 +96,10 @@ pub fn main() !void {
 
         // Verifying if its the last interation.
         if (i != para_directories.len - 1) {
-            try stdout.print("┃  ┖╴{s} generated!\n", .{README_FILE});
+            try stdout.print("┃  ┖╴{s} generated!\n", .{README_FILE_NAME});
             try stdout.print("┃  \n", .{});
         } else {
-            try stdout.print("   ┖╴{s} generated!\n", .{README_FILE});
+            try stdout.print("   ┖╴{s} generated!\n", .{README_FILE_NAME});
         }
     }
 
@@ -134,7 +112,7 @@ pub fn main() !void {
 /// Creates an README and writes content to it.
 fn writeReadME(dir: *std.fs.Dir, para_directory: ParaDirectory) !void {
     // Generate a ReadME.md file. 
-    const readme_file = try dir.createFile(README_FILE, .{});
+    const readme_file = try dir.createFile(README_FILE_NAME, .{});
     defer readme_file.close();
 
     // Write content to it. 
