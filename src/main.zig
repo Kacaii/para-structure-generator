@@ -1,7 +1,8 @@
 const std = @import("std");
+const builtin = @import("builtin");
+
 const ParaDirectory = @import("ParaDirectory.zig").ParaDirectory;
 const HELP_FILE = @embedFile("help.txt");
-
 const README_FILE_NAME = "README.md";
 
 const AnsiEscape = struct {
@@ -20,10 +21,16 @@ const para_directories = [4]ParaDirectory{
 };
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{ .safety = true }){};
-    defer _ = gpa.deinit();
+    var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
 
-    const allocator = gpa.allocator();
+    const allocator, const is_debug = switch (builtin.mode) {
+        .Debug, .ReleaseSafe => .{ debug_allocator.allocator(), true },
+        .ReleaseFast, .ReleaseSmall => .{ std.heap.smp_allocator, false },
+    };
+
+    defer if (is_debug) {
+        _ = debug_allocator.deinit();
+    };
 
     const args = std.process.argsAlloc(allocator) catch |err| {
         std.debug.print("Alloc failed {?}\n", .{err});
@@ -43,16 +50,16 @@ pub fn main() !void {
     // Defaults to the current one.
     const base_directory = if (args.len == 1) cwd else cwd.openDir(args[1], .{}) catch |err|
         switch (err) {
-        error.NotDir => {
-            std.log.err("Provided Path needs to be a Directory.", .{});
-            return;
-        },
-        error.FileNotFound => {
-            std.log.err("Provided Path does not exist.", .{});
-            return;
-        },
-        else => return err, // Returning unexpected error.
-    };
+            error.NotDir => {
+                std.log.err("Provided Path needs to be a Directory.", .{});
+                return;
+            },
+            error.FileNotFound => {
+                std.log.err("Provided Path does not exist.", .{});
+                return;
+            },
+            else => return err, // Returning unexpected error.
+        };
 
     try stdout.writeAll("\n");
 
